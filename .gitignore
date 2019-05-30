@@ -1,0 +1,18 @@
+._*
+.DS_Store
+*.xcuserstate
+project.xcworkspace/
+xcuserdata/
+*.o
+*.a
+core.*
+*.log
+*.dSYM
+*.so
+*.pyc
+*.ipynb
+
+# Folders
+__pycache__
+
+# Programs, etc.
