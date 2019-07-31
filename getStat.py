@@ -27,7 +27,7 @@ import logging
 import requests
 import json
 
-__version__ = '1.0.2'
+__version__ = '0.1'
 
 logger = logging.getLogger('Tesla')
 folders = ['~/logs', '~/Documents/Tesla/logs']
@@ -46,25 +46,63 @@ os.sys.path.append(os.path.expanduser('~/.ssh'))
 
 import tesla
 
-url = 'https://owner-api.teslamotors.com/api/1/vehicles/{}/vehicle_data'.format(tesla.vehicle_id)
-headers = {
-    'Authorization': 'Bearer {}'.format(tesla.token)
-}
+def requestData():
+    url = 'https://owner-api.teslamotors.com/api/1/vehicles/{}/vehicle_data'.format(tesla.vehicle_id)
+    headers = {
+        'Authorization': 'Bearer {}'.format(tesla.token)
+    }
+    res = requests.get(url, headers=headers)
+    dat = res.json()['response']
+    return dat
 
-g = requests.get(url, headers=headers)
+#
+#     M  A  I  N
+#
 
-data = g.json()['response']
+if __name__ == '__main__':
+    # First things first, parse all the arguments
+    usage = '''
+        getStat.py [options]
 
-if data is None:
-    print('Vehicle is sleeping')
-else:
-    jsonString = json.dumps(data)
-    # print(jsonString)
-    now = time.localtime(time.time())
-    path = '{}/{}'.format(os.path.expanduser('~/Documents/Tesla/'), time.strftime('%Y%m%d', now))
-    if not os.path.exists(path):
-        os.mkdir(path)
-    filename = '{}/{}'.format(path, time.strftime('%Y%m%d-%H%M.json', now))
-    with open(filename, 'w') as fid:
-        fid.write(jsonString)
-        fid.close()
+        examples:
+
+        getStat.py
+        getStat.py -v
+        '''
+    parser = argparse.ArgumentParser(prog='getStat', usage=usage, formatter_class=argparse.RawTextHelpFormatter)
+    parser.add_argument('-v', default=0, action='count', help='increase the verbosity level')
+    args = parser.parse_args()
+
+    # Another stream handler to show output on screen
+    handler = logging.StreamHandler()
+    if args.v > 1:
+        handler.setLevel(logging.DEBUG)
+        logger.setLevel(logging.DEBUG)
+    elif args.v:
+        handler.setLevel(logging.INFO)
+    else:
+        handler.setLevel(logging.WARNING)
+    handler.setFormatter(logging.Formatter('%(asctime)s %(message)s', datefmt='%Y/%m/%d %H:%M:%S'))
+    logger.addHandler(handler)
+
+    # Log an entry
+    logger.debug('--- Started ----------')
+    logger.info('Tesla Data {}'.format(__version__))
+
+    dat = requestData()
+
+    if dat is None:
+        if args.v:
+            logger.info('Vehicle is sleeping')
+    else:
+        jsonString = json.dumps(dat)
+        logger.info('Data received. battery_level = {}'.format(dat['charge_state']['battery_level']))
+        now = time.localtime(time.time())
+        path = '{}/{}'.format(os.path.expanduser('~/Documents/Tesla/'), time.strftime('%Y%m%d', now))
+        if not os.path.exists(path):
+            os.mkdir(path)
+        filename = '{}/{}'.format(path, time.strftime('%Y%m%d-%H%M.json', now))
+        with open(filename, 'w') as fid:
+            fid.write(jsonString)
+            fid.close()
+
