@@ -10,7 +10,6 @@ core.*
 *.dSYM
 *.so
 *.pyc
-*.ipynb
 
 # Folders
 __pycache__
