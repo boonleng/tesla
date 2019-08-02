@@ -3,6 +3,7 @@
 *.xcuserstate
 project.xcworkspace/
 xcuserdata/
+.ipynb_checkpoints/
 *.o
 *.a
 core.*
