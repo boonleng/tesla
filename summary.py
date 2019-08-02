@@ -56,6 +56,9 @@ def prettyAgeString(timestamp, showSeconds=True):
         ageString = 'now'
     return '{} ({})'.format(t.strftime('%Y%m%d-%H%M%S'), ageString)
 
+def c2f(c):
+    return c * 1.8 + 32
+
 #
 #     M  A  I  N
 #
@@ -77,6 +80,7 @@ if __name__ == '__main__':
         if data is None:
             print('Vehicle is sleeping.')
             exit(0)
+        print('From the vehicle directly.')
     else:
         folders = glob.glob('{}/2*'.format(getStat.dataLogHome))
         folders.sort()
@@ -87,23 +91,30 @@ if __name__ == '__main__':
         data = getStat.objFromFile(filename)
 
     if args.v:
-        print(data)
+        import pprint
+        pprint.pprint(data)
 
     t = datetime.datetime.fromtimestamp(data['charge_state']['timestamp'] / 1000)
     showVariable('timestamp', prettyAgeString(t))
     fullRange = data['charge_state']['battery_range'] / data['charge_state']['battery_level'] * 100.0
-    showVariable('derived_battery_health', '{:.1f} mi'.format(fullRange))
-    showKeyValue(data['charge_state'], 'ideal_battery_range', ' mi')
-    showKeyValue(data['charge_state'], 'est_battery_range', ' mi')
-    showKeyValue(data['charge_state'], 'battery_range', ' mi')
-    showKeyValue(data['charge_state'], 'battery_level', '%')
-    showKeyValue(data['climate_state'], 'is_climate_on')
-    tempC = data['climate_state']['inside_temp']
-    showVariable('inside_temp', '{:.1f}°C / {:.1f}°F'.format(tempC, tempC * 9 / 5))
-    showKeyValue(data['charge_state'], 'charging_state')
+    showVariable('projected_full_battery_range', '{:.1f} mi'.format(fullRange))       # my projected range at 100% charge
+    showKeyValue(data['charge_state'], 'ideal_battery_range', ' mi')                  # ideal range without degradation
+    showKeyValue(data['charge_state'], 'est_battery_range', ' mi')                    # range estimated from recent driving
+    showKeyValue(data['charge_state'], 'battery_range', ' mi')                        # current battery range
+    showKeyValue(data['charge_state'], 'battery_level', '%')                          # current battery state of charge
+    showKeyValue(data['climate_state'], 'is_climate_on')                              # climate control
+    tc = data['climate_state']['inside_temp']                                         # interior temperature
+    showVariable('inside_temp', '{:.1f}°C / {:.1f}°F'.format(tc, c2f(tc)))            # show temperature in C & F
+    tc = data['climate_state']['outside_temp']                                        # exterior temperature
+    showVariable('outside_temp', '{:.1f}°C / {:.1f}°F'.format(tc, c2f(tc)))           # show temperature in C & F
+    showKeyValue(data['charge_state'], 'charging_state')                              # charge state (disconnected, charging, etc.)
     if data['charge_state']['charging_state'] == "Charging":
-        showKeyValue(data['charge_state'], 'charger_power', ' kW')
-        showKeyValue(data['charge_state'], 'charger_voltage', ' V')
-        showKeyValue(data['charge_state'], 'charger_actual_current', ' A')
-    showKeyValue(data['vehicle_state'], 'is_user_present')
-    showKeyValue(data['vehicle_state'], 'sentry_mode')
+        showKeyValue(data['charge_state'], 'charger_power', ' kW')                    # charge power
+        showKeyValue(data['charge_state'], 'charger_voltage', ' V')                   # charge voltage
+        showKeyValue(data['charge_state'], 'charger_actual_current', ' A')            # charge current
+        showKeyValue(data['charge_state'], 'charge_rate', ' mi/hr')                   # charge rate at mi/hr
+    showKeyValue(data['vehicle_state'], 'is_user_present')                            # the presence of a user
+    showKeyValue(data['vehicle_state'], 'sentry_mode')                                # activation of sentry mode
+    showKeyValue(data['vehicle_state'], 'locked')                                     # vehicle lock
+    showKeyValue(data['vehicle_state'], 'odometer', ' mi')                            # odometer
+    showKeyValue(data['vehicle_state'], 'car_version')                                # software version

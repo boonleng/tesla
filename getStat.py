@@ -19,7 +19,6 @@
 __version__ = '1.0'
 
 import os
-#import re
 import time
 import argparse
 import logging
