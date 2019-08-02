@@ -5,14 +5,10 @@
 TARGET_FOLDER=${HOME}/Documents/Tesla
 SHOW_SECONDS=0
 
-dateFolder=$(ls ${TARGET_FOLDER} | tail -n 1)
-logfile=$(ls ${TARGET_FOLDER}/${dateFolder}/*.json | tail -n 1)
-str=$(cat ${logfile})
-
 function getValue() {
 	ss=".*\"${1}\": \([0-9a-zA-Z.]*\),"	
 	value=$(expr "${str}" : "${ss}")
-	echo ${value}
+	echo "${value}"
 }
 
 function cecho() {
@@ -44,6 +40,38 @@ function prettyAgeString() {
     fi
 }
 
+#
+#     M  A  I  N
+#
+
+verbose=0
+while getopts "rv" option; do
+    case ${option} in
+        r)
+            realtime=1
+            ;;
+        v)
+            verbose=$((verbose+1))
+            ;;
+        *)
+            ;;
+    esac
+done
+
+# ==============================================================
+
+if [ "${realtime}" ]; then
+    str=$(python showStat.py)
+
+    echo -e "From the vehicle directly:"
+else
+    dateFolder=$(ls ${TARGET_FOLDER} | tail -n 1)
+    logfile=$(ls ${TARGET_FOLDER}/${dateFolder}/*.json | tail -n 1)
+    str=$(cat ${logfile})
+
+    echo -e "From \033[38;5;228m${logfile}\033[m:"
+fi
+
 logTime=$(getValue "timestamp")
 logTime=$((logTime/1000))
 nowTime=$(date +%s)
@@ -51,9 +79,10 @@ logAge=$((nowTime - ${logTime}))
 logAgeString=$(prettyAgeString ${logAge})
 logAgeString=${logAgeString% }
 
-# ==============================================================
-
-echo -e "From \033[38;5;228m${logfile}\033[m:"
+if [ "${verbose}" -gt 0 ]; then
+    echo "${str}"
+    echo "logTime = ${logTime}"
+fi
 
 if [ "$(uname)" == "Linux" ]; then
 	datestr=$(date -d ${logTime} +%Y%m%d-%H%M%S)
@@ -63,6 +92,7 @@ fi
 cecho "timestamp" "${datestr} (${logAgeString% })"
 
 showKeyValue "battery_range" " mi"
+showKeyValue "ideal_battery_range" " mi"
 showKeyValue "battery_level" "%"
 # showKeyValue "inside_temp" "°C"
 c=$(getValue "inside_temp")

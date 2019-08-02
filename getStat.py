@@ -2,16 +2,21 @@
 
 """
     getStat.py
-    Tesla
+    Tesla Data Logger
 
     @author: Boonleng Cheong
 
     Updates
 
+    1.0    - 8/2/2019
+           - It is working. We can schedule this to run routinely through a cronjob
+
     0.1    - 7/21/2019
            - Started
 
 """
+
+__version__ = '1.0'
 
 import sys
 
@@ -27,8 +32,6 @@ import logging
 import requests
 import json
 
-__version__ = '0.1'
-
 logger = logging.getLogger('Tesla')
 folders = ['~/logs', '~/Documents/Tesla/logs']
 logfile = None
@@ -38,7 +41,6 @@ for folder in folders:
         logfile = '{}/tesla-{}.log'.format(folder, time.strftime('%Y%m%d', time.localtime(time.time())))
 if logfile is None:
     logfile = 'messages.log'
-# print(logfile)
 logging.basicConfig(filename=logfile, level=logging.INFO, format='%(asctime)s %(message)s', datefmt='%Y/%m/%d %H:%M:%S')
 logging.Formatter.converter = time.gmtime
 
@@ -70,6 +72,7 @@ if __name__ == '__main__':
         getStat.py -v
         '''
     parser = argparse.ArgumentParser(prog='getStat', usage=usage, formatter_class=argparse.RawTextHelpFormatter)
+    parser.add_argument('-w', '--write', default=False, action="store_true", help='writes the results to a file')
     parser.add_argument('-v', default=0, action='count', help='increase the verbosity level')
     args = parser.parse_args()
 
@@ -87,7 +90,7 @@ if __name__ == '__main__':
 
     # Log an entry
     logger.debug('--- Started ----------')
-    logger.info('Tesla Data {}'.format(__version__))
+    logger.info('Tesla Data Logger {}'.format(__version__))
 
     dat = requestData()
 
@@ -96,13 +99,19 @@ if __name__ == '__main__':
             logger.info('Vehicle is sleeping')
     else:
         jsonString = json.dumps(dat)
-        logger.info('Data received. battery_level = {}'.format(dat['charge_state']['battery_level']))
-        now = time.localtime(time.time())
-        path = '{}/{}'.format(os.path.expanduser('~/Documents/Tesla/'), time.strftime('%Y%m%d', now))
-        if not os.path.exists(path):
-            os.mkdir(path)
-        filename = '{}/{}'.format(path, time.strftime('%Y%m%d-%H%M.json', now))
-        with open(filename, 'w') as fid:
-            fid.write(jsonString)
-            fid.close()
+
+        logger.info('Data received. battery_level = {}   range = {} / {}   write = {}'.format(
+            dat['charge_state']['battery_level'],
+            dat['charge_state']['battery_range'],
+            dat['charge_state']['ideal_battery_range'],
+            args.write))
+        if args.write:
+            now = time.localtime(time.time())
+            path = '{}/{}'.format(os.path.expanduser('~/Documents/Tesla/'), time.strftime('%Y%m%d', now))
+            if not os.path.exists(path):
+                os.mkdir(path)
+            filename = '{}/{}'.format(path, time.strftime('%Y%m%d-%H%M.json', now))
+            with open(filename, 'w') as fid:
+                fid.write(jsonString)
+                fid.close()
 
