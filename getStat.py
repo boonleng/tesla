@@ -32,8 +32,10 @@ import logging
 import requests
 import json
 
+dataLogHome = os.path.expanduser('~/Documents/Tesla/')
+
 logger = logging.getLogger('Tesla')
-folders = ['~/logs', '~/Documents/Tesla/logs']
+folders = ['~/logs', '{}/logs'.format(dataLogHome)]
 logfile = None
 for folder in folders:
     folder = os.path.expanduser(folder)
@@ -56,6 +58,12 @@ def requestData():
     res = requests.get(url, headers=headers)
     dat = res.json()['response']
     return dat
+
+def objFromFile(filename):
+    with open(filename, 'r') as fobj:
+        json_str = fobj.readline()
+        fobj.close()
+    return json.loads(json_str)
 
 #
 #     M  A  I  N
@@ -107,7 +115,7 @@ if __name__ == '__main__':
             args.write))
         if args.write:
             now = time.localtime(time.time())
-            path = '{}/{}'.format(os.path.expanduser('~/Documents/Tesla/'), time.strftime('%Y%m%d', now))
+            path = '{}/{}'.format(dataLogHome, time.strftime('%Y%m%d', now))
             if not os.path.exists(path):
                 os.mkdir(path)
             filename = '{}/{}'.format(path, time.strftime('%Y%m%d-%H%M.json', now))

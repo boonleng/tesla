@@ -6,7 +6,7 @@ TARGET_FOLDER=${HOME}/Documents/Tesla
 SHOW_SECONDS=0
 
 function getValue() {
-	ss=".*\"${1}\": \([0-9a-zA-Z.]*\),"	
+	ss=".*\"${1}\": \([0-9a-zA-Z.\"]*\),"	
 	value=$(expr "${str}" : "${ss}")
 	echo "${value}"
 }
@@ -102,6 +102,11 @@ else
 fi
 cecho "timestamp" "${datestr} (${logAgeString% })"
 
+r=$(getValue "battery_range")
+p=$(getValue "battery_level")
+f=$(echo "scale=1; ${r} / ${p} * 100.0" | bc)
+cecho "derived_battery_health" "${f} mi"
+
 showKeyValue "ideal_battery_range" " mi"
 showKeyValue "battery_range" " mi"
 showKeyValue "battery_level" "%"
@@ -109,3 +114,11 @@ showKeyValue "battery_level" "%"
 c=$(getValue "inside_temp")
 f=$(echo "scale=1; ${c} * 9 / 5 + 32.0" | bc)
 cecho "inside_temp" "${c}°C / ${f}°F"
+c=$(getValue "charging_state")
+cecho "charging_state" "${c}"
+if [ "${c}" == "\"Charging\"" ]; then
+    showKeyValue "charger_power" " kW"
+    showKeyValue "charger_voltage" " V"
+    showKeyValue "charger_actual_current" " A"
+fi
+
