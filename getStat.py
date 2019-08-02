@@ -18,14 +18,8 @@
 
 __version__ = '1.0'
 
-import sys
-
-MIN_PYTHON = (3, 4)
-if sys.version_info < MIN_PYTHON:
-    sys.exit('Python %s or later is required.\n' % '.'.join("%s" % n for n in MIN_PYTHON))
-
 import os
-import re
+#import re
 import time
 import argparse
 import logging
