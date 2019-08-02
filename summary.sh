@@ -45,8 +45,19 @@ function prettyAgeString() {
 #
 
 verbose=0
-while getopts "rv" option; do
+while getopts "hrv" option; do
     case ${option} in
+        h)
+            echo "Vehicle Summary:"
+            echo ""
+            echo "summary.sh [-r] [-v]"
+            echo ""
+            echo "   - h    shows this help text"
+            echo "   - r    shows the real-time summary"
+            echo "   - v    increases verbosity"
+            echo ""
+            exit 0
+            ;;
         r)
             realtime=1
             ;;
@@ -91,8 +102,8 @@ else
 fi
 cecho "timestamp" "${datestr} (${logAgeString% })"
 
-showKeyValue "battery_range" " mi"
 showKeyValue "ideal_battery_range" " mi"
+showKeyValue "battery_range" " mi"
 showKeyValue "battery_level" "%"
 # showKeyValue "inside_temp" "°C"
 c=$(getValue "inside_temp")
