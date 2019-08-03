@@ -12,7 +12,7 @@ boolColor = 135
 numberColor = 82
 stringColor = 228
 
-def showVariable(variable, value, color=82):
+def showVariable(variable, value, color=numberColor):
     print('\033[38;5;214m{}\033[m = \033[38;5;{}m{}\033[m'.format(variable, color, value))
 
 def showKeyValue(obj, key, unit=""):
@@ -87,7 +87,7 @@ if __name__ == '__main__':
         dataLogs = glob.glob('{}/*.json'.format(folders[-1]))
         dataLogs.sort()
         filename = dataLogs[-1]
-        print('From \033[38;5;228m{}\033[m'.format(filename))
+        print('From \033[38;5;{}m{}\033[m'.format(stringColor, filename))
         data = getStat.objFromFile(filename)
 
     if args.v:
@@ -97,7 +97,7 @@ if __name__ == '__main__':
     t = datetime.datetime.fromtimestamp(data['charge_state']['timestamp'] / 1000)
     showVariable('timestamp', prettyAgeString(t))
     fullRange = data['charge_state']['battery_range'] / data['charge_state']['battery_level'] * 100.0
-    showVariable('projected_full_battery_range', '{:.1f} mi'.format(fullRange))       # my projected range at 100% charge
+    showVariable('projected_full_battery_range', '{:.1f} mi'.format(fullRange), 51)   # my projected range at 100% charge
     showKeyValue(data['charge_state'], 'ideal_battery_range', ' mi')                  # ideal range without degradation
     showKeyValue(data['charge_state'], 'est_battery_range', ' mi')                    # range estimated from recent driving
     showKeyValue(data['charge_state'], 'battery_range', ' mi')                        # current battery range
