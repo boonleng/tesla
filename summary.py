@@ -35,7 +35,14 @@ def prettyAgeString(timestamp, showSeconds=True):
         if d > 1:
             ageString += 's'
     s = age.seconds
-    m = int(s / 60)
+    h = int(s / 3600)
+    if h > 0:
+        if len(ageString):
+            ageString += ' '
+        ageString += '{} hour'.format(h)
+        if h > 1:
+            ageString += 's'
+    m = int((s - h * 3600) / 60)
     if m > 0:
         if len(ageString):
             ageString += ' '
@@ -43,7 +50,7 @@ def prettyAgeString(timestamp, showSeconds=True):
         if m > 1:
             ageString += 's'
     if showSeconds:
-        s -= m * 60
+        s -= (h * 3600 + m * 60)
         if s > 0:
             if len(ageString):
                 ageString += ' '
