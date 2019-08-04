@@ -14,5 +14,6 @@ core.*
 
 # Folders
 __pycache__
+fonts
 
 # Programs, etc.
