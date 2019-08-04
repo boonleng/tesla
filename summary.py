@@ -31,7 +31,7 @@ def prettyAgeString(timestamp, showSeconds=True):
     ageString = ''
     d = age.days
     if d > 0:
-        ageString += '{}'.format(d)
+        ageString += '{} day'.format(d)
         if d > 1:
             ageString += 's'
     s = age.seconds
