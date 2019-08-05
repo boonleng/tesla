@@ -124,57 +124,72 @@ def getCalendarArray():
 
     return tt, dd
 
-def getDataInHTML(figsize=(900, 640), padding=0.04):
+def getDataInHTML(padding=0.05):
 
     tt, dd = getCalendarArray()
 
+    # Initial figsize to get things started
+    figsize = (900, 135 * len(tt) + 90)
+
     # Size in pixels
-    w = figsize[0] / (7 + 6 * padding)
-    h = figsize[1] / (4.5 + 3 * padding)
+    w = int(figsize[0] / (7 + 6 * padding))
+    h = int(figsize[1] / (4.5 + 3 * padding))
 
     # Padding in pixels
-    o = w * padding
+    o = int(padding * w)
+
+    # Pixel-perfect figsize
+    figsize = (7 * (w + o) - o + 1, len(tt) * (h + o) - o + 90 + 1)
+
+    # Find the first datalog that is valid
+    week = next(w for w in dd[::-1] if any(w))
+    day = next(d for d in week[::-1] if d is not None)
+    d = day[-1]
+
+    lastUpdate = datetime.datetime.fromtimestamp(d['vehicle_state']['timestamp'] / 1000)
 
     code = '<html>'
-    code += '<head>'
-    code += '<meta charset="UTF-8">'
-    code += '<style type="text/css">'
-    code += '@font-face {font-family:"Helvetica Neue"; src:url(fonts/HelveticaNeueLight.ttf)} '
-    code += 'html {font-family: "Helvetica Neue", Arial, sans-serif; font-size:10pt} '
-    code += '.box-container {{display:block; position:relative; top:10px; margin:0 auto; width:{}px; height:{}px; background-color:white}} '.format(figsize[0], figsize[1])
-
-    code += '.box {{display:block; position:absolute; width:{}px; height:{}px; border:solid 1px #aaa}}'.format(w, h)
-    code += '.title {display:block; position:absolute; top:0} '
-    code += '.titleMonth, .titleYear {display:inline-block; font-size:2.0em;} '
-    code += '.titleMonth {font-weight:500} '
-    code += '.titleYear {margin-left:0.25em} '
-    code += '.dayOfWeek {{display:block; position:absolute; width:{}px; height:{}px; text-align:right}} '.format(w, 0.2 * h)
-
-    code += '.dayLabel, .titleDayLabel {display:block; position:absolute; top:5px; right:5px; font-size:1.1em; z-index:100} '
-    code += '.titleDayLabel {font-size:1.2em} '
-    code += '.otherMonth {color:#aaa;} '
-    code += '.batteryLevel {{display:block; position:absolute; bottom:0; width:{}%; background-color:#99ff00; z-index:0}} '.format(100)
-    code += '.lowCharge {background-color:#ffcc00} '
-
-    code += '.info {{display:block; position:absolute; bottom:10%; width:{}%; margin:0 {}%; padding:0; text-align:center}} '.format(100.0 * (1.0 - padding), 50.0 * padding)
-    code += '.textInfo {display:block; width:100%} '
-    code += '.large {font-size:1.8em; font-weight:500; font-stretch:extra-expanded; margin-bottom:0.3em} '
-    code += '.medium {line-height:1.2em} '
-    code += '.tiny {line-height:0.8em} '
-
-    code += '.iconBar {display:block; position:absolute; top:8px; left:8px; width:100%} '
-    code += 'img.icon {float:left; margin:0; width:18px; padding:2px} '
-    code += '</style>'
-    code += '</head>'
-
-    code += '<body>'
-
-    code += '<div class="box-container">'
-
-    code += '<div class="title">'
-    code += '<span class="titleMonth">{}</span><span class="titleYear">{}</span>'.format(tt[-1][0].strftime('%B'), tt[0][0].strftime('%Y'))
-    code += ' <span class="titleMonth"></span>'
-    code += '</div>'
+    code += '<head>\n'
+    code += '<meta charset="UTF-8">\n'
+    code += '<style type="text/css">\n'
+    code += '@font-face {font-family:"Helvetica Neue"; src:url(fonts/HelveticaNeueLight.ttf)}\n'
+    code += 'html {font-family: "Helvetica Neue", Arial, sans-serif; font-size:10pt}\n'
+    code += '.box-container {{display:block; position:relative; top:10px; margin:0 auto; width:{:.2f}px; height:{:.2f}px; background-color:white}}\n'.format(figsize[0], figsize[1])
+    code += '\n'
+    code += '.title {display:block; position:absolute; top:0}\n'
+    code += '.titleMonth, .titleYear {display:inline-block; font-size:2.4em;}\n'
+    code += '.titleMonth {font-weight:500}\n'
+    code += '.titleYear {margin-left:0.25em}\n'
+    code += '.vin {display:block; position:absolute; right:0}\n'
+    code += '.update {display:block; position:absolute; top:20px; right:0}\n'
+    code += '.dayOfWeek {{display:block; position:absolute; width:{}px; height:{}px; text-align:right}}\n'.format(w, 50)
+    code += '\n'
+    code += '.box {{display:inline-block; position:absolute; width:{:.2f}px; height:{:.2f}px; border:solid 1px #aaa}}\n\n'.format(w, h)
+    code += '.dayLabel, .titleDayLabel {display:block; position:absolute; top:5px; right:5px; font-size:1.1em; z-index:100}\n'
+    code += '.titleDayLabel {font-size:1.2em}\n'
+    code += '.otherMonth {color:#aaa;}\n'
+    code += '.batteryLevel {{display:block; position:absolute; bottom:0; width:{}%; background-color:#99ff00; z-index:0}}\n'.format(100)
+    code += '.lowCharge {background-color:#ffcc00}\n'
+    code += '\n'
+    code += '.info {{display:block; position:absolute; bottom:10%; width:{}%; margin:0 {}%; padding:0; text-align:center}}\n'.format(100.0 * (1.0 - padding), 50.0 * padding)
+    code += '.textInfo {display:block; width:100%; margin-bottom:0.3em; line-height:1.1em}\n'
+    code += '.large {font-size:1.8em; font-weight:500; font-stretch:extra-expanded}\n'
+    code += '.medium {font-size:1.0em}\n'
+    code += '.small {font-size:0.9em}\n'
+    code += '.tiny {font-size:0.8em}\n'
+    code += '\n'
+    code += '.iconBar {display:block; position:absolute; top:8px; left:8px; width:100%}\n'
+    code += 'img.icon {float:left; margin:0; width:18px; padding:2px}\n'
+    code += '</style>\n'
+    code += '</head>\n'
+    code += '\n'
+    code += '<body>\n'
+    code += '<div class="box-container">\n'
+    code += '<div class="title">\n'
+    code += '<span class="titleMonth">{}</span><span class="titleYear">{}</span>\n'.format(tt[-1][0].strftime('%B'), tt[0][0].strftime('%Y'))
+    code += '</div>\n'
+    code += '<span class="vin medium"><b>{}</b> / {}</span>\n'.format(d['vehicle_state']['vehicle_name'], d['vin'])
+    code += '<span class="update medium">Last updated: {}</span>\n'.format(lastUpdate.strftime('%Y-%m-%d %I:%M %p'))
 
     # Use the latest day to decide the target month
     targetMonth = tt[-1][0].month
@@ -182,10 +197,10 @@ def getDataInHTML(figsize=(900, 640), padding=0.04):
     # The top row show days of the week
     for i in range(7):
         x = i * (w + o)
-        y = 0.28 * h
-        code += '<div class="dayOfWeek" style="left:{:.2f}px; top:{:.2f}px">'.format(x, y,)
-        code += '<span class="titleDayLabel">{}</span>'.format(tt[0][i].strftime('%a'))
-        code += '</div>'
+        y = 60
+        code += '<div class="dayOfWeek" style="left:{:.2f}px; top:{:.2f}px">\n'.format(x, y)
+        code += '<span class="titleDayLabel">{}</span>\n'.format(tt[0][i].strftime('%a'))
+        code += '</div>\n'
 
     # Odometer reading from the previous day
     o1 = 0.0
@@ -195,11 +210,13 @@ def getDataInHTML(figsize=(900, 640), padding=0.04):
     for j in range(len(tt)):
         for i in range(len(tt[j])):
             x = i * (w + o)
-            y = j * (h + o) + 0.5 * h
+            y = j * (h + o) + 90
             xc = x + 0.5 * w
 
-            # Background
-            code += '<div class="box" style="left:{:.2f}px; top:{:.2f}px">'.format(x, y)
+            # A day container
+            code += '<div class="box" style="left:{:.2f}px; top:{:.2f}px">\n'.format(x, y)
+
+            # code += '<div class="box">\n'
 
             # The day label.
             if mo != tt[j][i].month:
@@ -211,52 +228,49 @@ def getDataInHTML(figsize=(900, 640), padding=0.04):
                 elementClass = ' otherMonth'
             else:
                 elementClass = ''
-            code += '<span class="dayLabel{}">{}</span>'.format(elementClass, dayString)
+            code += '<span class="dayLabel{}">{}</span>\n'.format(elementClass, dayString)
 
             # Skip the day if there is no data
-            if dd[j][i] is None:
-                code += '</div>'
-                continue
+            if dd[j][i]:
+                # Battery level
+                dayArray = dd[j][i]
+                batteryLevel = dayArray[-1]['charge_state']['battery_level']
+                if batteryLevel <= 60.0:
+                    elementClass = ' lowCharge'
+                else:
+                    elementClass = ''
+                code += '<div class="batteryLevel{}" style="height:{}%"></div>\n'.format(elementClass, batteryLevel)
 
-            # Battery level
-            dayArray = dd[j][i]
-            batteryLevel = dayArray[-1]['charge_state']['battery_level']
-            if batteryLevel <= 60.0:
-                elementClass = ' lowCharge'
-            else:
-                elementClass = ''
-            code += '<div class="batteryLevel{}" style="height:{}%"></div>'.format(elementClass, batteryLevel)
+                # Calculate total miles driven
+                if o1 == 0.0:
+                    o1 = dayArray[0]['vehicle_state']['odometer']
+                o0 = dayArray[-1]['vehicle_state']['odometer']
+                delta_o = o0 - o1
+                o1 = o0
 
-            # Calculate total miles driven
-            if o1 == 0.0:
-                o1 = dayArray[0]['vehicle_state']['odometer']
-            o0 = dayArray[-1]['vehicle_state']['odometer']
-            delta_o = o0 - o1
-            o1 = o0
+                #
+                sw = dayArray[-1]['vehicle_state']['car_version']
 
-            #
-            sw = dayArray[-1]['vehicle_state']['car_version']
+                # Icon bar using the information derived earlier
+                code += '<div class="iconBar">\n'
+                if delta_o > 20:
+                    code += '<img class="icon" src="blob/wheel.png">\n'
+                if any([d['charge_state']['charging_state'] == 'Charging' for d in dayArray]):
+                    code += '<img class="icon" src="blob/charge-0.png">\n'
+                code += '</div>\n'
 
-            # Icon bar using the information derived earlier
-            code += '<div class="iconBar">'
-            if any([d['charge_state']['charging_state'] == 'Charging' for d in dayArray]):
-                code += '<img class="icon" src="blob/charge-0.png">'
-            if delta_o > 20:
-                code += '<img class="icon" src="blob/wheel.png">'
-            code += '</div>'
+                # Lines of information
+                code += '<div class="info">\n'
+                code += '<span class="textInfo large">{}%</span>\n'.format(batteryLevel)
+                code += '<span class="textInfo medium">{}</span>\n'.format(tt[j][i].strftime('%I:%M %p'))
+                code += '<span class="textInfo medium">{:.1f} mi ({})</span>\n'.format(delta_o, len(dayArray))
+                code += '<span class="textInfo tiny">{}</span>\n'.format(sw)
+                code += '</div>\n'
 
-            # Lines of information
-            code += '<div class="info">'
-            code += '<span class="textInfo large">{}%</span>'.format(batteryLevel)
-            code += '<span class="textInfo medium">{}</span>'.format(tt[j][i].strftime('%I:%M %p'))
-            code += '<span class="textInfo medium">{:.1f} mi ({})</span>'.format(delta_o, len(dayArray))
-            code += '<span class="textInfo small">{}</span>'.format(sw)
-            code += '</div>'
+            code += '</div>\n'
 
-            code += '</div>'
-
-    code += '</div>'
-    code += '</body>'
-    code += '</html>'
+    code += '</div>\n'
+    code += '</body>\n'
+    code += '</html>\n'
 
     return code
