@@ -6,7 +6,7 @@ import glob
 import datetime
 import argparse
 
-import getStat
+import foundation
 
 boolColor = 135
 numberColor = 82
@@ -83,19 +83,19 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if args.r:
-        data = getStat.requestData()
+        data = foundation.requestData()
         if data is None:
             print('Vehicle is sleeping.')
             exit(0)
         print('From the vehicle directly.')
     else:
-        folders = glob.glob('{}/2*'.format(getStat.dataLogHome))
+        folders = glob.glob('{}/2*'.format(foundation.dataLogHome))
         folders.sort()
         dataLogs = glob.glob('{}/*.json'.format(folders[-1]))
         dataLogs.sort()
         filename = dataLogs[-1]
         print('From \033[38;5;{}m{}\033[m'.format(stringColor, filename))
-        data = getStat.objFromFile(filename)
+        data = foundation.objFromFile(filename)
 
     if args.v:
         import pprint

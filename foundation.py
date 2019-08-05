@@ -124,16 +124,16 @@ def getCalendarArray():
 
     return tt, dd
 
-def getDataInHTML(figsize=(900, 640), o=0.04):
+def getDataInHTML(figsize=(900, 640), padding=0.04):
 
     tt, dd = getCalendarArray()
 
     # Size in pixels
-    w = figsize[0] / (7 + 6 * o)
-    h = figsize[1] / (4.5 + 3 * o)
+    w = figsize[0] / (7 + 6 * padding)
+    h = figsize[1] / (4.5 + 3 * padding)
 
-    # Offset in pixels
-    o = w * o
+    # Padding in pixels
+    o = w * padding
 
     code = '<html>'
     code += '<head>'
@@ -146,16 +146,17 @@ def getDataInHTML(figsize=(900, 640), o=0.04):
     code += '.box {{display:block; position:absolute; width:{}px; height:{}px; border:solid 1px #aaa}}'.format(w, h)
     code += '.title {display:block; position:absolute; top:0} '
     code += '.titleMonth, .titleYear {display:inline-block; font-size:2.0em;} '
-    code += '.titleMonth {font-weight:500;} '
+    code += '.titleMonth {font-weight:500} '
+    code += '.titleYear {margin-left:0.25em} '
     code += '.dayOfWeek {{display:block; position:absolute; width:{}px; height:{}px; text-align:right}} '.format(w, 0.2 * h)
 
     code += '.dayLabel, .titleDayLabel {display:block; position:absolute; top:5px; right:5px; font-size:1.1em; z-index:100} '
     code += '.titleDayLabel {font-size:1.2em} '
     code += '.otherMonth {color:#aaa;} '
-    code += '.batteryLevel {display:block; position:absolute; bottom:0; width:100%; background-color:#99ff00; z-index:0} '
+    code += '.batteryLevel {{display:block; position:absolute; bottom:0; width:{}%; background-color:#99ff00; z-index:0}} '.format(100)
     code += '.lowCharge {background-color:#ffcc00} '
 
-    code += '.info {display:block; position:absolute; bottom:10%; width:95%; margin:0 2.5%; padding:0; text-align:center} '
+    code += '.info {{display:block; position:absolute; bottom:10%; width:{}%; margin:0 {}%; padding:0; text-align:center}} '.format(100.0 * (1.0 - padding), 50.0 * padding)
     code += '.textInfo {display:block; width:100%} '
     code += '.large {font-size:1.8em; font-weight:500; font-stretch:extra-expanded; margin-bottom:0.3em} '
     code += '.medium {line-height:1.2em} '
