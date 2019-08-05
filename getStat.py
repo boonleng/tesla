@@ -23,6 +23,7 @@ __version__ = '1.1'
 
 import os
 import time
+import json
 import argparse
 
 import foundation
@@ -71,11 +72,14 @@ if __name__ == '__main__':
             args.write))
         if args.write:
             now = time.localtime(time.time())
-            path = '{}/{}'.format(dataLogHome, time.strftime('%Y%m%d', now))
+            path = '{}/{}'.format(foundation.dataLogHome, time.strftime('%Y%m%d', now))
             if not os.path.exists(path):
                 os.mkdir(path)
             filename = '{}/{}'.format(path, time.strftime('%Y%m%d-%H%M.json', now))
             with open(filename, 'w') as fid:
                 fid.write(jsonString)
                 fid.close()
-
+            code = foundation.getDataInHTML()
+            with open(os.path.expanduser('~/Developer/tesla/test.html'), 'w') as fid:
+                fid.write(code)
+                fid.close()
