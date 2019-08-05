@@ -139,30 +139,30 @@ def getDataInHTML(figsize=(900, 640), o=0.04):
     code += '<head>'
     code += '<meta charset="UTF-8">'
     code += '<style type="text/css">'
-    code += '@font-face {{font-family:"Helvetica Neue"; src:url(fonts/HelveticaNeueLight.ttf)}} '
-    code += 'html {{font-family: "Helvetica Neue", Arial, sans-serif; font-size:10pt}} '
+    code += '@font-face {font-family:"Helvetica Neue"; src:url(fonts/HelveticaNeueLight.ttf)} '
+    code += 'html {font-family: "Helvetica Neue", Arial, sans-serif; font-size:10pt} '
     code += '.box-container {{display:block; position:relative; top:10px; margin:0 auto; width:{}px; height:{}px; background-color:white}} '.format(figsize[0], figsize[1])
 
     code += '.box {{display:block; position:absolute; width:{}px; height:{}px; border:solid 1px #aaa}}'.format(w, h)
-    code += '.title {{display:block; position:absolute; top:0}} '
-    code += '.titleMonth, .titleYear {{display:inline-block; font-size:2.0em;}} '
-    code += '.titleMonth {{font-weight:500;}} '
+    code += '.title {display:block; position:absolute; top:0} '
+    code += '.titleMonth, .titleYear {display:inline-block; font-size:2.0em;} '
+    code += '.titleMonth {font-weight:500;} '
     code += '.dayOfWeek {{display:block; position:absolute; width:{}px; height:{}px; text-align:right}} '.format(w, 0.2 * h)
 
-    code += '.dayLabel, .titleDayLabel {{display:block; position:absolute; top:5px; right:5px; font-size:1.1em; z-index:100}} '
-    code += '.titleDayLabel {{font-size:1.2em; }} '
-    code += '.otherMonth {{color:#aaa;}} '
-    code += '.batteryLevel {{display:block; position:absolute; bottom:0; width:100%; background-color:#99ff00; z-index:0}} '
-    code += '.lowCharge {{background-color:#ffcc00}} '
+    code += '.dayLabel, .titleDayLabel {display:block; position:absolute; top:5px; right:5px; font-size:1.1em; z-index:100} '
+    code += '.titleDayLabel {font-size:1.2em} '
+    code += '.otherMonth {color:#aaa;} '
+    code += '.batteryLevel {display:block; position:absolute; bottom:0; width:100%; background-color:#99ff00; z-index:0} '
+    code += '.lowCharge {background-color:#ffcc00} '
 
-    code += '.info {{display:block; position:absolute; bottom:10%; width:95%; margin:0 2.5%; padding:0; text-align:center}} '
-    code += '.textInfo {{display:block; width:100%}} '
-    code += '.large {{font-size:1.8em; font-weight:500; font-stretch:extra-expanded; margin-bottom:0.3em}} '
-    code += '.medium {{line-height:1.2em}} '
-    code += '.tiny {{line-height:0.8em}} '
+    code += '.info {display:block; position:absolute; bottom:10%; width:95%; margin:0 2.5%; padding:0; text-align:center} '
+    code += '.textInfo {display:block; width:100%} '
+    code += '.large {font-size:1.8em; font-weight:500; font-stretch:extra-expanded; margin-bottom:0.3em} '
+    code += '.medium {line-height:1.2em} '
+    code += '.tiny {line-height:0.8em} '
 
-    code += '.iconBar {{display:block; position:absolute; top:8px; left:8px; width:100%}}'
-    code += 'img.icon {{float:left; margin:0; width:18px; padding:2px}} '
+    code += '.iconBar {display:block; position:absolute; top:8px; left:8px; width:100%} '
+    code += 'img.icon {float:left; margin:0; width:18px; padding:2px} '
     code += '</style>'
     code += '</head>'
 
@@ -171,8 +171,8 @@ def getDataInHTML(figsize=(900, 640), o=0.04):
     code += '<div class="box-container">'
 
     code += '<div class="title">'
-    code += '<span class="titleMonth">{}</span>&nbsp; <span class="titleYear">{}</span>'.format(tt[-1][0].strftime('%B'), tt[0][0].strftime('%Y'))
-    code += ' <span class="titleMonth">&nbsp; 🚘 🔋 ⚡️</span>'
+    code += '<span class="titleMonth">{}</span><span class="titleYear">{}</span>'.format(tt[-1][0].strftime('%B'), tt[0][0].strftime('%Y'))
+    code += ' <span class="titleMonth"></span>'
     code += '</div>'
 
     # Use the latest day to decide the target month
