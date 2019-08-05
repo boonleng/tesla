@@ -1,4 +1,5 @@
 import os
+import json
 import logging
 
 logger = logging.getLogger('Tesla')
@@ -20,3 +21,9 @@ def showInfoMessages():
 def shortenPath(path, n):
     parts = path.split('/')
     return '...{}'.format('/'.join(parts[-n:])) if len(parts) > n else path
+
+def objFromFile(filename):
+    with open(filename, 'r') as fobj:
+        json_str = fobj.readline()
+        fobj.close()
+    return json.loads(json_str)
