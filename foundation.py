@@ -168,18 +168,18 @@ def getDataInHTML(padding=0.05):
     code += '.dayLabel, .titleDayLabel {display:block; position:absolute; top:5px; right:5px; font-size:1.1em; z-index:100}\n'
     code += '.titleDayLabel {font-size:1.2em}\n'
     code += '.otherMonth {color:#aaa;}\n'
-    code += '.batteryLevel {{display:block; position:absolute; bottom:0; width:{}%; background-color:#99ff00; z-index:0}}\n'.format(100)
+    code += '.chargeLevel {{display:block; position:absolute; bottom:0; width:{}%; background-color:#88ff00; z-index:0}}\n'.format(100)
     code += '.lowCharge {background-color:#ffcc00}\n'
     code += '\n'
-    code += '.info {{display:block; position:absolute; bottom:10%; width:{}%; margin:0 {}%; padding:0; text-align:center}}\n'.format(100.0 * (1.0 - padding), 50.0 * padding)
-    code += '.textInfo {display:block; width:100%; margin-bottom:0.3em; line-height:1.1em}\n'
+    code += '.info {{display:block; position:absolute; bottom:8%; width:{}%; margin:0 {}%; padding:0; text-align:center}}\n'.format(100.0 * (1.0 - padding), 50.0 * padding)
+    code += '.textInfo {display:block; width:100%; margin-bottom:0.3em; line-height:1.0em}\n'
     code += '.large {font-size:1.8em; font-weight:500; font-stretch:extra-expanded}\n'
     code += '.medium {font-size:1.0em}\n'
     code += '.small {font-size:0.9em}\n'
     code += '.tiny {font-size:0.8em}\n'
     code += '\n'
-    code += '.iconBar {display:block; position:absolute; top:8px; left:8px; width:100%}\n'
-    code += 'img.icon {float:left; margin:0; width:18px; padding:2px}\n'
+    code += '.iconBar {display:block; position:absolute; top:5px; left:8px; width:100%}\n'
+    code += 'img.icon {float:left; margin:0; width:16px; padding:2px}\n'
     code += '</style>\n'
     code += '</head>\n'
     code += '\n'
@@ -188,7 +188,7 @@ def getDataInHTML(padding=0.05):
     code += '<div class="title">\n'
     code += '<span class="titleMonth">{}</span><span class="titleYear">{}</span>\n'.format(tt[-1][0].strftime('%B'), tt[0][0].strftime('%Y'))
     code += '</div>\n'
-    code += '<span class="vin medium"><b>{}</b> / {}</span>\n'.format(d['vehicle_state']['vehicle_name'], d['vin'])
+    code += '<span class="vin medium"><b>{}</b> / {} / {}</span>\n'.format(d['vehicle_state']['vehicle_name'], d['vin'], d['vehicle_state']['car_version'])
     code += '<span class="update medium">Last updated: {}</span>\n'.format(lastUpdate.strftime('%Y-%m-%d %I:%M %p'))
 
     # Use the latest day to decide the target month
@@ -234,12 +234,12 @@ def getDataInHTML(padding=0.05):
             if dd[j][i]:
                 # Battery level
                 dayArray = dd[j][i]
-                batteryLevel = dayArray[-1]['charge_state']['battery_level']
-                if batteryLevel <= 60.0:
+                chargeLevel = dayArray[-1]['charge_state']['battery_level']
+                if chargeLevel <= 60.0:
                     elementClass = ' lowCharge'
                 else:
                     elementClass = ''
-                code += '<div class="batteryLevel{}" style="height:{}%"></div>\n'.format(elementClass, batteryLevel)
+                code += '<div class="chargeLevel{}" style="height:{}%"></div>\n'.format(elementClass, chargeLevel)
 
                 # Calculate total miles driven
                 if o1 == 0.0:
@@ -248,8 +248,11 @@ def getDataInHTML(padding=0.05):
                 delta_o = o0 - o1
                 o1 = o0
 
-                #
-                sw = dayArray[-1]['vehicle_state']['car_version']
+                # day
+                # temp = [d['climate_state']['outside_temp'] for d in dayArray]
+                # temp = np.array(temp, dtype=np.float)
+                # minTemp = np.nanmin(temp) * 9 / 5 + 32.0
+                # maxTemp = np.nanmax(temp) * 9 / 5 + 32.0
 
                 # Icon bar using the information derived earlier
                 code += '<div class="iconBar">\n'
@@ -261,10 +264,10 @@ def getDataInHTML(padding=0.05):
 
                 # Lines of information
                 code += '<div class="info">\n'
-                code += '<span class="textInfo large">{}%</span>\n'.format(batteryLevel)
-                code += '<span class="textInfo medium">{}</span>\n'.format(tt[j][i].strftime('%I:%M %p'))
-                code += '<span class="textInfo medium">{:.1f} mi ({})</span>\n'.format(delta_o, len(dayArray))
-                code += '<span class="textInfo tiny">{}</span>\n'.format(sw)
+                code += '<span class="textInfo large">{}%</span>\n'.format(chargeLevel)
+                code += '<span class="textInfo medium">{}</span>\n'.format(tt[j][i].strftime('%-I:%M %p'))
+                code += '<span class="textInfo medium">{:+.1f} mi ({})</span>\n'.format(delta_o, len(dayArray))
+                code += '<span class="textInfo medium">{:.1f} mi</span>\n'.format(o0)
                 code += '</div>\n'
 
             code += '</div>\n'

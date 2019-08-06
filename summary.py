@@ -126,8 +126,3 @@ if __name__ == '__main__':
     showKeyValue(data['vehicle_state'], 'locked')                                     # vehicle lock
     showKeyValue(data['vehicle_state'], 'odometer', ' mi')                            # odometer
     showKeyValue(data['vehicle_state'], 'car_version')                                # software version
-
-    code = foundation.getDataInHTML()
-    with open(os.path.expanduser('~/Developer/tesla/test.html'), 'w') as fid:
-        fid.write(code)
-        fid.close()
