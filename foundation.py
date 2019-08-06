@@ -166,6 +166,7 @@ def getDataInHTML(padding=0.05):
     code += '\n'
     code += '.box {{display:inline-block; position:absolute; width:{:.2f}px; height:{:.2f}px; border:solid 1px #aaa}}\n\n'.format(w, h)
     code += '.dayLabel, .titleDayLabel {display:block; position:absolute; top:5px; right:5px; font-size:1.1em; z-index:100}\n'
+    code += '.today {color:#39f; font-weight:500}\n'
     code += '.titleDayLabel {font-size:1.2em}\n'
     code += '.otherMonth {color:#aaa;}\n'
     code += '.chargeLevel {{display:block; position:absolute; bottom:0; width:{}%; background-color:#88ff00; z-index:0}}\n'.format(100)
@@ -188,8 +189,8 @@ def getDataInHTML(padding=0.05):
     code += '<div class="title">\n'
     code += '<span class="titleMonth">{}</span><span class="titleYear">{}</span>\n'.format(tt[-1][0].strftime('%B'), tt[0][0].strftime('%Y'))
     code += '</div>\n'
-    code += '<span class="vin medium"><b>{}</b> / {} / {}</span>\n'.format(d['vehicle_state']['vehicle_name'], d['vin'], d['vehicle_state']['car_version'])
-    code += '<span class="update medium">Last updated: {}</span>\n'.format(lastUpdate.strftime('%Y-%m-%d %I:%M %p'))
+    code += '<span class="vin medium"><b>{}</b> • {} • {}</span>\n'.format(d['vehicle_state']['vehicle_name'], d['vin'], d['vehicle_state']['car_version'])
+    code += '<span class="update medium">Last Updated: {}</span>\n'.format(lastUpdate.strftime('%Y-%m-%d %I:%M %p'))
 
     # Use the latest day to decide the target month
     targetMonth = tt[-1][0].month
@@ -207,6 +208,7 @@ def getDataInHTML(padding=0.05):
 
     # Now we go through the days
     mo = tt[0][0].month
+    todayString = datetime.datetime.today().strftime('%-d')
     for j in range(len(tt)):
         for i in range(len(tt[j])):
             x = i * (w + o)
@@ -224,10 +226,12 @@ def getDataInHTML(padding=0.05):
                 dayString = '{}'.format(tt[j][i].strftime('%b %-d'))
             else:
                 dayString = '{}'.format(tt[j][i].strftime('%-d'))
+            elementClass = ''
             if targetMonth != mo:
-                elementClass = ' otherMonth'
-            else:
-                elementClass = ''
+                elementClass += ' otherMonth'
+            if dayString == todayString:
+                elementClass += ' today'
+            
             code += '<span class="dayLabel{}">{}</span>\n'.format(elementClass, dayString)
 
             # Skip the day if there is no data
