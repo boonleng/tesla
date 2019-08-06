@@ -189,7 +189,7 @@ def getDataInHTML(padding=0.05):
     code += '<div class="title">\n'
     code += '<span class="titleMonth">{}</span><span class="titleYear">{}</span>\n'.format(tt[-1][0].strftime('%B'), tt[0][0].strftime('%Y'))
     code += '</div>\n'
-    code += '<span class="vin medium"><b>{}</b> • {} • {}</span>\n'.format(d['vehicle_state']['vehicle_name'], d['vin'], d['vehicle_state']['car_version'])
+    code += '<span class="vin medium"><b>{}</b> - {} - {}</span>\n'.format(d['vehicle_state']['vehicle_name'], d['vin'], d['vehicle_state']['car_version'])
     code += '<span class="update medium">Last Updated: {}</span>\n'.format(lastUpdate.strftime('%Y-%m-%d %I:%M %p'))
 
     # Use the latest day to decide the target month
@@ -260,7 +260,7 @@ def getDataInHTML(padding=0.05):
 
                 # Icon bar using the information derived earlier
                 code += '<div class="iconBar">\n'
-                if delta_o > 20:
+                if delta_o > 1.0:
                     code += '<img class="icon" src="blob/wheel.png">\n'
                 if any([d['charge_state']['charging_state'] == 'Charging' for d in dayArray]):
                     code += '<img class="icon" src="blob/charge-0.png">\n'

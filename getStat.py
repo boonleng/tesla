@@ -80,6 +80,6 @@ if __name__ == '__main__':
                 fid.write(jsonString)
                 fid.close()
             code = foundation.getDataInHTML()
-            with open(os.path.expanduser('~/Developer/tesla/test.html'), 'w') as fid:
+            with open(os.path.expanduser('~/Developer/tesla/calendar.html'), 'w') as fid:
                 fid.write(code)
                 fid.close()
