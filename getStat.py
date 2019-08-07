@@ -88,4 +88,4 @@ if __name__ == '__main__':
             with open(os.path.expanduser('~/Developer/tesla/calendar.html'), 'w') as fid:
                 fid.write(code)
                 fid.close()
-            tesla.logger.info('HTML updated.')
+            tesla.logger.info('HTML calendar updated.')

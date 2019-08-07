@@ -86,7 +86,7 @@ def getCalendarArray():
 
     return tt, dd
 
-def getDataInHTML(padding=0.05):
+def getDataInHTML(padding=0.05, showFadeIcon=True):
 
     tt, dd = getCalendarArray()
 
@@ -146,7 +146,8 @@ def getDataInHTML(padding=0.05):
     code += '.tiny {font-size:0.8em}\n'
     code += '\n'
     code += '.iconBar {display:block; position:absolute; top:5px; left:8px; width:100%}\n'
-    code += 'img.icon {float:left; margin:0; width:16px; padding:2px}\n'
+    code += 'img.icon, .blankIcon {display:block; float:left; margin:0; width:16px; height:16px; padding:2px 3px}\n'
+    code += '.fade {opacity:0.15;}'
     code += '</style>\n'
     code += '</head>\n'
     code += '\n'
@@ -218,12 +219,16 @@ def getDataInHTML(padding=0.05):
                 o0 = dayArray[-1]['vehicle_state']['odometer']
                 delta_o = o0 - o1
                 o1 = o0
+                carDriven = delta_o > 1.0
 
                 # day
                 # temp = [d['climate_state']['outside_temp'] for d in dayArray]
                 # temp = np.array(temp, dtype=np.float)
                 # minTemp = np.nanmin(temp) * 9 / 5 + 32.0
                 # maxTemp = np.nanmax(temp) * 9 / 5 + 32.0
+
+                # If there was a charging event
+                carCharged = any([d['charge_state']['charging_state'] == 'Charging' for d in dayArray])
 
                 # Software version
                 if s1 is None:
@@ -236,13 +241,17 @@ def getDataInHTML(padding=0.05):
                 s1 = s0
 
                 # Icon bar using the information derived earlier
+                def insertOrFadeIcon(cond, image):
+                    appendix = ''
+                    if cond or showFadeIcon:
+                        if not cond and showFadeIcon:
+                            appendix = ' fade'
+                        return '<img class="icon{}" src="{}">\n'.format(appendix, image)
+                    return ''
                 code += '<div class="iconBar">\n'
-                if delta_o > 1.0:
-                    code += '<img class="icon" src="blob/wheel.png">\n'
-                if any([d['charge_state']['charging_state'] == 'Charging' for d in dayArray]):
-                    code += '<img class="icon" src="blob/charge-0.png">\n'
-                if carUpdated:
-                    code += '<img class="icon" src="blob/upgrade.png">\n'
+                code += insertOrFadeIcon(carDriven, "blob/wheel.png")
+                code += insertOrFadeIcon(carCharged, "blob/charge.png")
+                code += insertOrFadeIcon(carUpdated, "blob/up.png")
                 code += '</div>\n'
 
                 # Lines of information
