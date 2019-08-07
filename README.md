@@ -14,11 +14,11 @@ git clone https://github.com/boonleng/tesla.git
 
 Run the script once
 ```shell
-getStat.py
+getStat.py -v -w
 ```
 or
 ```shell
-python getStat.py
+python getStat.py -v -w
 ```
 
 ## Cronjob
