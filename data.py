@@ -165,11 +165,9 @@ def getDataInHTML(padding=0.05):
         code += '<span class="titleDayLabel">{}</span>\n'.format(tt[0][i].strftime('%a'))
         code += '</div>\n'
 
-    # Odometer reading from the previous day
-    o1 = 0.0
-
-    # Software version
-    s1 = ''
+    # Odometer reading and software version from the previous day
+    o1 = None
+    s1 = None
 
     # Now we go through the days
     mo = tt[0][0].month
@@ -211,7 +209,7 @@ def getDataInHTML(padding=0.05):
                 code += '<div class="chargeLevel{}" style="height:{}%"></div>\n'.format(elementClass, chargeLevel)
 
                 # Calculate total miles driven
-                if o1 == 0.0:
+                if o1 is None:
                     o1 = dayArray[0]['vehicle_state']['odometer']
                 o0 = dayArray[-1]['vehicle_state']['odometer']
                 delta_o = o0 - o1
@@ -224,13 +222,14 @@ def getDataInHTML(padding=0.05):
                 # maxTemp = np.nanmax(temp) * 9 / 5 + 32.0
 
                 # Software version
-                if len(s1) == 0:
+                if s1 is None:
                     s1 = dayArray[0]['vehicle_state']['car_version']
                 s0 = dayArray[-1]['vehicle_state']['car_version']
                 if s0 != s1:
                     carUpdated = True
                 else:
                     carUpdated = False
+                s1 = s0
 
                 # Icon bar using the information derived earlier
                 code += '<div class="iconBar">\n'

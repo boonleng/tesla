@@ -3,9 +3,9 @@
 __version__ = '1.0'
 
 import os
-import foundation
+import data
 
-code = foundation.getDataInHTML()
+code = data.getDataInHTML()
 with open(os.path.expanduser('~/Developer/tesla/calendar.html'), 'w') as fid:
     fid.write(code)
     fid.close()
