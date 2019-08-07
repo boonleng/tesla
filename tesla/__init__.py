@@ -52,7 +52,7 @@ def getCalendarArray():
 
     # Find the 4th Sunday before present day
     t0 = t[-1]
-    while time.localtime(t0).tm_wday != 0:
+    while time.localtime(t0).tm_wday != 6:
         t0 -= 86400
     t0 -= 21 * 86400
 

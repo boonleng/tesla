@@ -12,6 +12,8 @@ import tesla
 boolColor = 135
 numberColor = 82
 stringColor = 228
+otherColor = 51
+noneColor = 199
 
 def showVariable(variable, value, color=numberColor):
     print('\033[38;5;214m{}\033[m = \033[38;5;{}m{}\033[m'.format(variable, color, value))
@@ -110,30 +112,30 @@ if __name__ == '__main__':
     t = data['charge_state']['timestamp'] / 1000
     showVariable('timestamp', prettyAgeString(t))
     fullRange = data['charge_state']['battery_range'] / data['charge_state']['battery_level'] * 100.0
-    showVariable('projected_full_battery_range', '{:.1f} mi'.format(fullRange), 51)   # my projected range at 100% charge
-    showKeyValue(data['charge_state'], 'ideal_battery_range', ' mi')                  # ideal range without degradation
-    showKeyValue(data['charge_state'], 'est_battery_range', ' mi')                    # range estimated from recent driving
-    showKeyValue(data['charge_state'], 'battery_range', ' mi')                        # current battery range
-    showKeyValue(data['charge_state'], 'battery_level', '%')                          # current battery state of charge
-    showKeyValue(data['climate_state'], 'is_climate_on')                              # climate control
-    tc = data['climate_state']['inside_temp']                                         # interior temperature
-    if tc is None:
-        showVariable('inside_temp', 'None', boolColor)                                # show temperature in C & F
-    else:
-        showVariable('inside_temp', '{:.1f}°C / {:.1f}°F'.format(tc, c2f(tc)))        # show temperature in C & F
-    tc = data['climate_state']['outside_temp']                                        # exterior temperature
-    if tc is None:
-        showVariable('outside_temp', 'None', boolColor)                               # show temperature in C & F
-    else:
-        showVariable('outside_temp', '{:.1f}°C / {:.1f}°F'.format(tc, c2f(tc)))       # show temperature in C & F
-    showKeyValue(data['charge_state'], 'charging_state')                              # charge state (disconnected, charging, etc.)
-    if data['charge_state']['charging_state'] == "Charging":
-        showKeyValue(data['charge_state'], 'charger_power', ' kW')                    # charge power
-        showKeyValue(data['charge_state'], 'charger_voltage', ' V')                   # charge voltage
-        showKeyValue(data['charge_state'], 'charger_actual_current', ' A')            # charge current
-        showKeyValue(data['charge_state'], 'charge_rate', ' mi/hr')                   # charge rate at mi/hr
-    showKeyValue(data['vehicle_state'], 'is_user_present')                            # the presence of a user
-    showKeyValue(data['vehicle_state'], 'sentry_mode')                                # activation of sentry mode
-    showKeyValue(data['vehicle_state'], 'locked')                                     # vehicle lock
-    showKeyValue(data['vehicle_state'], 'odometer', ' mi')                            # odometer
-    showKeyValue(data['vehicle_state'], 'car_version')                                # software version
+    showVariable('projected_full_battery_range', '{:.1f} mi'.format(fullRange), otherColor)     # my projected range at 100% charge
+    showKeyValue(data['charge_state'], 'ideal_battery_range', ' mi')                            # ideal range without degradation
+    showKeyValue(data['charge_state'], 'est_battery_range', ' mi')                              # range estimated from recent driving
+    showKeyValue(data['charge_state'], 'battery_range', ' mi')                                  # current battery range
+    showKeyValue(data['charge_state'], 'battery_level', '%')                                    # current battery state of charge
+    showKeyValue(data['climate_state'], 'is_climate_on')                                        # climate control
+    tc = data['climate_state']['inside_temp']                                                   # interior temperature
+    if tc is None:                                                                              #
+        showVariable('inside_temp', 'None', noneColor)                                          # no temperature reading reported
+    else:                                                                                       #
+        showVariable('inside_temp', '{:.1f}°C / {:.1f}°F'.format(tc, c2f(tc)))                  # show temperature in C & F
+    tc = data['climate_state']['outside_temp']                                                  # exterior temperature
+    if tc is None:                                                                              #
+        showVariable('outside_temp', 'None', noneColor)                                         # no temperature reading reported
+    else:                                                                                       #
+        showVariable('outside_temp', '{:.1f}°C / {:.1f}°F'.format(tc, c2f(tc)))                 # show temperature in C & F
+    showKeyValue(data['charge_state'], 'charging_state')                                        # charge state (disconnected, charging, etc.)
+    if data['charge_state']['charging_state'] == "Charging":                                    #
+        showKeyValue(data['charge_state'], 'charger_power', ' kW')                              # charge power
+        showKeyValue(data['charge_state'], 'charger_voltage', ' V')                             # charge voltage
+        showKeyValue(data['charge_state'], 'charger_actual_current', ' A')                      # charge current
+        showKeyValue(data['charge_state'], 'charge_rate', ' mi/hr')                             # charge rate at mi/hr
+    showKeyValue(data['vehicle_state'], 'is_user_present')                                      # the presence of a user
+    showKeyValue(data['vehicle_state'], 'sentry_mode')                                          # activation of sentry mode
+    showKeyValue(data['vehicle_state'], 'locked')                                               # vehicle lock
+    showKeyValue(data['vehicle_state'], 'odometer', ' mi')                                      # odometer
+    showKeyValue(data['vehicle_state'], 'car_version')                                          # software version
