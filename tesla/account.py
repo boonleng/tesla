@@ -3,7 +3,7 @@ import json
 import requests
 import configparser
 
-import base
+from . import base
 
 def getConfig():
     if not os.path.exists(base.rcFile):

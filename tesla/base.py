@@ -12,7 +12,7 @@ logger = logging.getLogger('Tesla')
 def showMessageLevel(level=logging.WARNING):
     if len(logger.handlers) == 0:
         handler = logging.StreamHandler()
-        handler.setFormatter(logging.Formatter('%(asctime)s %(message)s', datefmt='%Y/%m/%d %H:%M:%S'))
+        handler.setFormatter(logging.Formatter('%(asctime)s %(message)s', datefmt='%H:%M:%S'))
         logger.addHandler(handler)
     else:
         handler = logger.landlers[0]
@@ -36,11 +36,7 @@ for folder in folders:
         logfile = '{}/tesla-{}.log'.format(folder, time.strftime('%Y%m%d', time.localtime(time.time())))
 if logfile is None:
     logfile = 'messages.log'
-logging.basicConfig(filename=logfile, level=logging.INFO, format='%(asctime)s %(message)s', datefmt='%Y/%m/%d %H:%M:%S')
+logging.basicConfig(filename=logfile, level=logging.INFO, format='%(asctime)s %(message)s', datefmt='%H:%M:%S')
 logging.Formatter.converter = time.gmtime
 
 logger.setLevel(logging.INFO)
-
-def shortenPath(path, n):
-    parts = path.split('/')
-    return '...{}'.format('/'.join(parts[-n:])) if len(parts) > n else path

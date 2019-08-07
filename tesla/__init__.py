@@ -4,8 +4,8 @@ import glob
 import requests
 import datetime
 
-import base
-import account
+from .base import *
+from . import account
 
 config = account.getConfig()
 
@@ -89,6 +89,10 @@ def getCalendarArray():
 def getDataInHTML(padding=0.05):
 
     tt, dd = getCalendarArray()
+
+    # Do this to ensure custom fonts are available
+    import tesla.font
+    prop = tesla.font.Properties()
 
     # Initial figsize to get things started
     figsize = (900, 135 * len(tt) + 90)
@@ -194,7 +198,7 @@ def getDataInHTML(padding=0.05):
                 elementClass += ' otherMonth'
             if dayString == todayString:
                 elementClass += ' today'
-            
+
             code += '<span class="dayLabel{}">{}</span>\n'.format(elementClass, dayString)
 
             # Process the day if there is data

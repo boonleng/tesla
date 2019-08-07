@@ -7,7 +7,7 @@ import matplotlib
 import matplotlib.font_manager
 import urllib.request
 
-import base
+from . import base
 
 folder = 'fonts'
 
@@ -16,8 +16,9 @@ class Properties:
         # Check if .../fonts/HelveticaNeueBold.ttf exists
         if not os.path.exists(folder):
             os.makedirs(folder)
-        if not os.path.isfile('{}/HelveticaNeueBold.ttf'.format(folder)) or force_refresh:
-            base.logger.info('iRadar fonts not exist. Downloading from server...')
+        file = '{}/HelveticaNeueLight.ttf'.format(folder)
+        if not os.path.isfile(file) or force_refresh:
+            base.logger.info('My favorite fonts are not found. Downloading from my father\'s server...')
             urllib.request.urlretrieve('https://arrc.ou.edu/iradar/fonts.zip', 'fonts.zip')
             with zipfile.ZipFile('fonts.zip') as zipped:
                 for info in zipped.infolist():
@@ -27,6 +28,8 @@ class Properties:
                     with open(file, 'wb') as outfile:
                         with zipped.open(info) as zippedfile:
                             outfile.write(zippedfile.read())
+            if os.path.isfile(file):
+                base.logger.info('Fonts downloaded.')
             os.remove('fonts.zip')
 
         file = '{}/HelveticaNeueBold.ttf'.format(folder)

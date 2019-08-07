@@ -7,8 +7,7 @@ import glob
 import datetime
 import argparse
 
-import base
-import data
+import tesla
 
 boolColor = 135
 numberColor = 82
@@ -87,22 +86,22 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if args.v:
-        base.showInfoMessages()
-        
+        tesla.showInfoMessages()
+
     if args.r:
-        data = data.requestData()
+        data = tesla.requestData()
         if data is None:
             print('Vehicle is sleeping.')
             exit(0)
         print('From the vehicle directly.')
     else:
-        folders = glob.glob('{}/2*'.format(base.dataLogHome))
+        folders = glob.glob('{}/2*'.format(tesla.dataLogHome))
         folders.sort()
         dataLogs = glob.glob('{}/*.json'.format(folders[-1]))
         dataLogs.sort()
         filename = dataLogs[-1]
         print('From \033[38;5;{}m{}\033[m'.format(stringColor, filename))
-        data = data.objFromFile(filename)
+        data = tesla.objFromFile(filename)
 
     if args.v:
         import pprint
