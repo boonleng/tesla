@@ -5,11 +5,8 @@ import configparser
 
 import foundation
 
-site = 'owner-api.teslamotors.com'
-rcFile = os.path.expanduser('~/.teslarc')
-
 def getConfig():
-    if not os.path.exists(rcFile):
+    if not os.path.exists(foundation.rcFile):
         foundation.logger.info('No configuration file. Setting up ...')
         try:
             username = input('Enter username: ')
@@ -23,17 +20,17 @@ def getConfig():
         import getpass
         import keyring
 
-        password = keyring.get_password(site, username)
+        password = keyring.get_password(foundation.site, username)
         if not password:
             password = getpass.getpass('Enter password: ')
             if not password:
                 foundation.logger.info('Setup aborted. No password provided.')
                 return None
-            keyring.set_password(site, username, password)
+            keyring.set_password(foundation.site, username, password)
             foundation.logger.info('Password saved to Keychain Access')
 
         # Retrieve a token using the login provided
-        url = 'https://{}/oauth/token'.format(site)
+        url = 'https://{}/oauth/token'.format(foundation.site)
         payload = {
             'grant_type': 'password',
             'client_id': '81527cff06843c8634fdc09e8ac0abefb46ac849f38fe1e431c2ef2106796384',
@@ -42,7 +39,7 @@ def getConfig():
             'password': password
         }
         headers = {
-            'Host': site,
+            'Host': foundation.site,
             'User-Agent': 'Learning',
             'Content-Type': 'application/json'
         }
@@ -77,7 +74,7 @@ def getConfig():
                 config[key] = {'id': car['id'],
                                'vid': car['vehicle_id'],
                                'name': car['display_name']}
-        with open(rcFile, 'w') as fid:
+        with open(foundation.rcFile, 'w') as fid:
             config.write(fid)
 
         foundation.logger.info('Config setup complete')
@@ -85,7 +82,7 @@ def getConfig():
     # Make a config and load the configuration
     config = configparser.ConfigParser()
     try:
-        config.read(rcFile)
+        config.read(foundation.rcFile)
     except configparser.ParsingError as e:
         foundation.logger.exception('Bad config file.')
         raise ConfigError from e
@@ -100,3 +97,33 @@ def getConfig():
         if sec not in ['user', 'token']:
             cars.append(dict(config[sec]))
     return {'username':config['user']['username'], 'token':dict(config['token']), 'cars':cars}
+
+def refreshToken():
+    # Load the current configuration
+    config = configparser.ConfigParser()
+    try:
+        config.read(foundation.rcFile)
+    except configparser.ParsingError as e:
+        foundation.logger.exception('Bad config file.')
+        raise ConfigError from e
+    url = 'https://{}/oauth/token'.format(foundation.site)
+    payload = {
+        'grant_type': 'refresh_token',
+        'client_id': '81527cff06843c8634fdc09e8ac0abefb46ac849f38fe1e431c2ef2106796384',
+        'client_secret': 'c7257eb71a564034f9419ee651c7d0e5f7aa6bfbd18bafb5c5c033b093bb2fa3',
+        'refresh_token': config['token']['refresh_token']
+    }
+    headers = {
+        'Host': foundation.site,
+        'User-Agent': 'Learning',
+        'Content-Type': 'application/json'
+    }
+    #r = requests.post(url, data=json.dumps(payload), headers=headers)
+    if r.status_code == 200:
+        token = r.json()
+        # Update config
+        config['token'] = r.json()
+        print(config)
+        with open(foundation.rcFile, 'w') as fid:
+            config.write(fid)
+

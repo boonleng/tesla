@@ -8,6 +8,7 @@ import datetime
 import argparse
 
 import foundation
+import data
 
 boolColor = 135
 numberColor = 82
@@ -83,8 +84,11 @@ if __name__ == '__main__':
     parser.add_argument('-v', default=0, action='count', help='increase verbosity')
     args = parser.parse_args()
 
+    if args.v:
+        foundation.showInfoMessages()
+        
     if args.r:
-        data = foundation.requestData()
+        data = data.requestData()
         if data is None:
             print('Vehicle is sleeping.')
             exit(0)
@@ -96,7 +100,7 @@ if __name__ == '__main__':
         dataLogs.sort()
         filename = dataLogs[-1]
         print('From \033[38;5;{}m{}\033[m'.format(stringColor, filename))
-        data = foundation.objFromFile(filename)
+        data = data.objFromFile(filename)
 
     if args.v:
         import pprint

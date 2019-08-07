@@ -1,53 +1,13 @@
 import os
 import json
 import glob
-import time
-import logging
 import requests
 import datetime
 
-# Some global constants
-site = 'owner-api.teslamotors.com'
-rcFile = os.path.expanduser('~/.teslarc')
-dataLogHome = os.path.expanduser('~/Documents/Tesla')
-logger = logging.getLogger('Tesla')
+import foundation
+import account
 
-# Loggin levels
-def showMessageLevel(level=logging.WARNING):
-    if len(logger.handlers) == 0:
-        handler = logging.StreamHandler()
-        handler.setFormatter(logging.Formatter('%(asctime)s %(message)s', datefmt='%Y/%m/%d %H:%M:%S'))
-        logger.addHandler(handler)
-    else:
-        handler = logger.landlers[0]
-        handler.setLevel(level)
-
-def showWarningMessages():
-    showMessageLevel(logging.WARNING)
-
-def showDebugMessages():
-    showMessageLevel(logging.DEBUG)
-
-def showInfoMessages():
-    showMessageLevel(logging.INFO)
-
-# Data log folder
-folders = ['~/logs', '{}/logs'.format(dataLogHome)]
-logfile = None
-for folder in folders:
-    folder = os.path.expanduser(folder)
-    if os.path.exists(folder):
-        logfile = '{}/tesla-{}.log'.format(folder, time.strftime('%Y%m%d', time.localtime(time.time())))
-if logfile is None:
-    logfile = 'messages.log'
-logging.basicConfig(filename=logfile, level=logging.INFO, format='%(asctime)s %(message)s', datefmt='%Y/%m/%d %H:%M:%S')
-logging.Formatter.converter = time.gmtime
-
-logger.setLevel(logging.INFO)
-
-def shortenPath(path, n):
-    parts = path.split('/')
-    return '...{}'.format('/'.join(parts[-n:])) if len(parts) > n else path
+config = account.getConfig()
 
 def requestData(index=0):
     vehicleId = config['cars'][index]['id']
@@ -58,6 +18,7 @@ def requestData(index=0):
     res = requests.get(url, headers=headers)
     if res.status_code == 200:
         return res.json()['response']
+    foundation.logger.info('Vechicle connection error. r = {}'.format(res.status_code))
     return None
 
 def objFromFile(filename):
@@ -67,7 +28,7 @@ def objFromFile(filename):
     return json.loads(json_str)
 
 def getLatestDays(count=31):
-    folders = glob.glob('{}/2*'.format(dataLogHome))
+    folders = glob.glob('{}/2*'.format(foundation.dataLogHome))
     folders.sort()
 
     t = []
