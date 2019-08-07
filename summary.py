@@ -7,7 +7,7 @@ import glob
 import datetime
 import argparse
 
-import foundation
+import base
 import data
 
 boolColor = 135
@@ -87,7 +87,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if args.v:
-        foundation.showInfoMessages()
+        base.showInfoMessages()
         
     if args.r:
         data = data.requestData()
@@ -96,7 +96,7 @@ if __name__ == '__main__':
             exit(0)
         print('From the vehicle directly.')
     else:
-        folders = glob.glob('{}/2*'.format(foundation.dataLogHome))
+        folders = glob.glob('{}/2*'.format(base.dataLogHome))
         folders.sort()
         dataLogs = glob.glob('{}/*.json'.format(folders[-1]))
         dataLogs.sort()

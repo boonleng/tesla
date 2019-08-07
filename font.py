@@ -7,7 +7,7 @@ import matplotlib
 import matplotlib.font_manager
 import urllib.request
 
-import foundation
+import base
 
 folder = 'fonts'
 
@@ -17,13 +17,13 @@ class Properties:
         if not os.path.exists(folder):
             os.makedirs(folder)
         if not os.path.isfile('{}/HelveticaNeueBold.ttf'.format(folder)) or force_refresh:
-            foundation.logger.info('iRadar fonts not exist. Downloading from server...')
+            base.logger.info('iRadar fonts not exist. Downloading from server...')
             urllib.request.urlretrieve('https://arrc.ou.edu/iradar/fonts.zip', 'fonts.zip')
             with zipfile.ZipFile('fonts.zip') as zipped:
                 for info in zipped.infolist():
                     file = '{}/{}'.format(folder, info.filename)
-                    foundation.logger.debug('Unzipping file {} ...'.format(info.filename))
-                    foundation.logger.debug('-> {} ...'.format(file))
+                    base.logger.debug('Unzipping file {} ...'.format(info.filename))
+                    base.logger.debug('-> {} ...'.format(file))
                     with open(file, 'wb') as outfile:
                         with zipped.open(info) as zippedfile:
                             outfile.write(zippedfile.read())

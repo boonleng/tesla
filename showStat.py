@@ -1,6 +1,6 @@
 import json
-import getStat
+from data import requestData
 
-dat = getStat.requestData()
+dat = requestData()
 
 print(json.dumps(dat))

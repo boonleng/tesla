@@ -4,7 +4,7 @@ import glob
 import requests
 import datetime
 
-import foundation
+import base
 import account
 
 config = account.getConfig()
@@ -18,7 +18,7 @@ def requestData(index=0):
     res = requests.get(url, headers=headers)
     if res.status_code == 200:
         return res.json()['response']
-    foundation.logger.info('Vechicle connection error. r = {}'.format(res.status_code))
+    base.logger.info('Vechicle connection error. r = {}'.format(res.status_code))
     return None
 
 def objFromFile(filename):
@@ -28,7 +28,7 @@ def objFromFile(filename):
     return json.loads(json_str)
 
 def getLatestDays(count=31):
-    folders = glob.glob('{}/2*'.format(foundation.dataLogHome))
+    folders = glob.glob('{}/2*'.format(base.dataLogHome))
     folders.sort()
 
     t = []

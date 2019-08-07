@@ -3,34 +3,34 @@ import json
 import requests
 import configparser
 
-import foundation
+import base
 
 def getConfig():
-    if not os.path.exists(foundation.rcFile):
-        foundation.logger.info('No configuration file. Setting up ...')
+    if not os.path.exists(base.rcFile):
+        base.logger.info('No configuration file. Setting up ...')
         try:
             username = input('Enter username: ')
             if len(username) == 0:
-                foundation.logger.info('Setup aborted. No username provided.')
+                base.logger.info('Setup aborted. No username provided.')
                 return None
         except KeyboardInterrupt:
-            foundation.logger.exception('Setup aborted. User aborted the setup.')
+            base.logger.exception('Setup aborted. User aborted the setup.')
             return None
 
         import getpass
         import keyring
 
-        password = keyring.get_password(foundation.site, username)
+        password = keyring.get_password(base.site, username)
         if not password:
             password = getpass.getpass('Enter password: ')
             if not password:
-                foundation.logger.info('Setup aborted. No password provided.')
+                base.logger.info('Setup aborted. No password provided.')
                 return None
-            keyring.set_password(foundation.site, username, password)
-            foundation.logger.info('Password saved to Keychain Access')
+            keyring.set_password(base.site, username, password)
+            base.logger.info('Password saved to Keychain Access')
 
         # Retrieve a token using the login provided
-        url = 'https://{}/oauth/token'.format(foundation.site)
+        url = 'https://{}/oauth/token'.format(base.site)
         payload = {
             'grant_type': 'password',
             'client_id': '81527cff06843c8634fdc09e8ac0abefb46ac849f38fe1e431c2ef2106796384',
@@ -39,13 +39,13 @@ def getConfig():
             'password': password
         }
         headers = {
-            'Host': foundation.site,
+            'Host': base.site,
             'User-Agent': 'Learning',
             'Content-Type': 'application/json'
         }
         r = requests.post(url, data=json.dumps(payload), headers=headers)
         if r.status_code != 200:
-            foundation.logger.exception('Unable to retrieve token. r = {}'.format(r.status_code))
+            base.logger.exception('Unable to retrieve token. r = {}'.format(r.status_code))
             return None
         token = r.json()
 
@@ -59,7 +59,7 @@ def getConfig():
         if r.status_code == 200:
             cars = r.json()['response']
         else:
-            foundation.logger.exception('Unable to retrieve list of vehicles.')
+            base.logger.exception('Unable to retrieve list of vehicles.')
 
         # Save username and token into the configuration
         config = configparser.ConfigParser()
@@ -74,22 +74,22 @@ def getConfig():
                 config[key] = {'id': car['id'],
                                'vid': car['vehicle_id'],
                                'name': car['display_name']}
-        with open(foundation.rcFile, 'w') as fid:
+        with open(base.rcFile, 'w') as fid:
             config.write(fid)
 
-        foundation.logger.info('Config setup complete')
+        base.logger.info('Config setup complete')
 
     # Make a config and load the configuration
     config = configparser.ConfigParser()
     try:
-        config.read(foundation.rcFile)
+        config.read(base.rcFile)
     except configparser.ParsingError as e:
-        foundation.logger.exception('Bad config file.')
+        base.logger.exception('Bad config file.')
         raise ConfigError from e
 
     # Assess the completeness
     if not all(sec in config.sections() for sec in ['user', 'token']):
-        foundation.logger.exception('Bad config file. Try removing it and rerun this script.')
+        base.logger.exception('Bad config file. Try removing it and rerun this script.')
         return None
 
     cars = []
@@ -102,11 +102,11 @@ def refreshToken():
     # Load the current configuration
     config = configparser.ConfigParser()
     try:
-        config.read(foundation.rcFile)
+        config.read(base.rcFile)
     except configparser.ParsingError as e:
-        foundation.logger.exception('Bad config file.')
+        base.logger.exception('Bad config file.')
         raise ConfigError from e
-    url = 'https://{}/oauth/token'.format(foundation.site)
+    url = 'https://{}/oauth/token'.format(base.site)
     payload = {
         'grant_type': 'refresh_token',
         'client_id': '81527cff06843c8634fdc09e8ac0abefb46ac849f38fe1e431c2ef2106796384',
@@ -114,7 +114,7 @@ def refreshToken():
         'refresh_token': config['token']['refresh_token']
     }
     headers = {
-        'Host': foundation.site,
+        'Host': base.site,
         'User-Agent': 'Learning',
         'Content-Type': 'application/json'
     }
@@ -124,6 +124,6 @@ def refreshToken():
         # Update config
         config['token'] = r.json()
         print(config)
-        with open(foundation.rcFile, 'w') as fid:
+        with open(base.rcFile, 'w') as fid:
             config.write(fid)
 

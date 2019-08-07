@@ -8,11 +8,11 @@
 
     Updates
 
-    1.1    - 8/6/2019
+    1.2    - 8/6/2019
            - Moved a lot of reusable functions to data.py
 
     1.1    - 8/5/2019
-           - Moved a lot of reusable functions to foundation.py
+           - Moved a lot of reusable functions to base.py
 
     1.0    - 8/2/2019
            - It is working. We can schedule this to run routinely through a cronjob
@@ -29,7 +29,7 @@ import time
 import json
 import argparse
 
-import foundation
+import base
 import data
 
 
@@ -54,29 +54,29 @@ if __name__ == '__main__':
 
     # Set the logger to output something if verbosity flag is set
     if args.v > 1:
-        foundation.showDebugMessages()
+        base.showDebugMessages()
     elif args.v:
-        foundation.showInfoMessages()
+        base.showInfoMessages()
 
     # Log an entry
-    foundation.logger.debug('--- Started ----------')
-    foundation.logger.info('Tesla Data Logger {}'.format(__version__))
+    base.logger.debug('--- Started ----------')
+    base.logger.info('Tesla Data Logger {}'.format(__version__))
 
     dat = data.requestData()
 
     if dat is None:
-        foundation.logger.info('Vehicle is sleeping')
+        base.logger.info('Vehicle is sleeping')
     else:
         jsonString = json.dumps(dat)
 
-        foundation.logger.info('Data received. battery_level = {}   range = {} / {}   write = {}'.format(
+        base.logger.info('Data received. battery_level = {}   range = {} / {}   write = {}'.format(
             dat['charge_state']['battery_level'],
             dat['charge_state']['battery_range'],
             dat['charge_state']['ideal_battery_range'],
             args.write))
         if args.write:
             now = time.localtime(time.time())
-            path = '{}/{}'.format(foundation.dataLogHome, time.strftime('%Y%m%d', now))
+            path = '{}/{}'.format(base.dataLogHome, time.strftime('%Y%m%d', now))
             if not os.path.exists(path):
                 os.mkdir(path)
             filename = '{}/{}'.format(path, time.strftime('%Y%m%d-%H%M.json', now))
