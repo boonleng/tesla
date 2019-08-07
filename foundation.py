@@ -1,19 +1,21 @@
 import os
+import json
 import glob
 import time
-import json
 import logging
 import requests
 import datetime
 
-# Import the token from a secure location
-os.sys.path.append(os.path.expanduser('~/.ssh'))
-import tesla
+import account
 
 # Some global constants
-logger = logging.getLogger('Tesla')
+site = 'owner-api.teslamotors.com'
+rcFile = os.path.expanduser('~/.teslarc')
 dataLogHome = os.path.expanduser('~/Documents/Tesla')
+logger = logging.getLogger('Tesla')
+config = account.getConfig()
 
+# Loggin levels
 def showMessageLevel(level=logging.WARNING):
     if len(logger.handlers) == 0:
         handler = logging.StreamHandler()
@@ -50,12 +52,15 @@ def shortenPath(path, n):
     parts = path.split('/')
     return '...{}'.format('/'.join(parts[-n:])) if len(parts) > n else path
 
-def requestData():
-    url = 'https://owner-api.teslamotors.com/api/1/vehicles/{}/vehicle_data'.format(tesla.vehicle_id)
+def requestData(index=0):
+    vehicleId = config['cars'][index]['id']
+    url = 'https://owner-api.teslamotors.com/api/1/vehicles/{}/vehicle_data'.format(vehicleId)
     headers = {
-        'Authorization': 'Bearer {}'.format(tesla.token)
+        'Authorization': 'Bearer {}'.format(config['token']['access_token'])
     }
     res = requests.get(url, headers=headers)
+    if res.status_code == 408 or res.status_code == 404:
+        return None
     dat = res.json()['response']
     return dat
 
