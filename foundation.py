@@ -59,10 +59,9 @@ def requestData(index=0):
         'Authorization': 'Bearer {}'.format(config['token']['access_token'])
     }
     res = requests.get(url, headers=headers)
-    if res.status_code == 408 or res.status_code == 404:
-        return None
-    dat = res.json()['response']
-    return dat
+    if res.status_code == 200:
+        return res.json()['response']
+    return None
 
 def objFromFile(filename):
     with open(filename, 'r') as fobj:

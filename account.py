@@ -22,7 +22,7 @@ def getConfig():
 
         import getpass
         import keyring
-        
+
         password = keyring.get_password(site, username)
         if not password:
             password = getpass.getpass('Enter password: ')
@@ -33,7 +33,7 @@ def getConfig():
             foundation.logger.info('Password saved to Keychain Access')
 
         # Retrieve a token using the login provided
-        url = 'https://{}/oauto/token'.format(site)
+        url = 'https://{}/oauth/token'.format(site)
         payload = {
             'grant_type': 'password',
             'client_id': '81527cff06843c8634fdc09e8ac0abefb46ac849f38fe1e431c2ef2106796384',
@@ -48,14 +48,14 @@ def getConfig():
         }
         r = requests.post(url, data=json.dumps(payload), headers=headers)
         if r.status_code != 200:
-            foundation.logger.exception('Unable to retrieve token.')
+            foundation.logger.exception('Unable to retrieve token. r = {}'.format(r.status_code))
             return None
         token = r.json()
 
         # Retrieve a list of vehicles
         url = 'https://owner-api.teslamotors.com/api/1/vehicles'
         headers = {
-            'Authorization': 'Bearer {}'.format(config['token']['access_token'])
+            'Authorization': 'Bearer {}'.format(token['access_token'])
         }
         r = requests.get(url, headers=headers)
         cars = []
@@ -74,9 +74,9 @@ def getConfig():
             for car in cars:
                 key = car['vin']
                 config.add_section(key)
-                config[key] = {'id':car['id'],
-                               'vid':car['vehicle_id'],
-                               'name':car['display_name']}
+                config[key] = {'id': car['id'],
+                               'vid': car['vehicle_id'],
+                               'name': car['display_name']}
         with open(rcFile, 'w') as fid:
             config.write(fid)
 
