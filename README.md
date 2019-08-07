@@ -3,6 +3,10 @@ Tesla Data Logger
 
 Fetch information from a Tesla vehicle through the unofficial Tesla API (https://www.teslaapi.io).
 
+## Screenshot
+
+A HTML file is generated to present a summary of the last 4 weeks of logs.
+
 ![Figure](blob/screenshot.png)
 
 ## Recommended Setup Procedures
