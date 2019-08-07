@@ -1,0 +1,331 @@
+<html><head>
+<meta charset="UTF-8">
+<style type="text/css">
+@font-face {font-family:"Helvetica Neue"; src:url(fonts/HelveticaNeueLight.ttf)}
+html {font-family: "Helvetica Neue", Arial, sans-serif; font-size:10pt}
+.box-container {display:block; position:relative; top:10px; margin:0 auto; width:898.00px; height:649.00px; background-color:white}
+
+.title {display:block; position:absolute; top:0}
+.titleMonth, .titleYear {display:inline-block; font-size:2.4em;}
+.titleMonth {font-weight:500}
+.titleYear {margin-left:0.25em}
+.vin {display:block; position:absolute; right:0}
+.update {display:block; position:absolute; top:20px; right:0}
+.dayOfWeek {display:block; position:absolute; width:123px; height:50px; text-align:right}
+
+.box {display:inline-block; position:absolute; width:123.00px; height:135.00px; border:solid 1px #aaa}
+
+.dayLabel, .titleDayLabel {display:block; position:absolute; top:5px; right:5px; font-size:1.1em; z-index:100}
+.today {color:#39f; font-weight:500}
+.titleDayLabel {font-size:1.2em}
+.otherMonth {color:#aaa;}
+.chargeLevel {display:block; position:absolute; bottom:0; width:100%; background-color:#88ff00; z-index:0}
+.lowCharge {background-color:#ffcc00}
+
+.info {display:block; position:absolute; bottom:8%; width:95.0%; margin:0 2.5%; padding:0; text-align:center}
+.textInfo {display:block; width:100%; margin-bottom:0.3em; line-height:1.0em}
+.large {font-size:1.8em; font-weight:500; font-stretch:extra-expanded}
+.medium {font-size:1.0em}
+.small {font-size:0.9em}
+.tiny {font-size:0.8em}
+
+.iconBar {display:block; position:absolute; top:5px; left:8px; width:100%}
+img.icon, .blankIcon {display:block; float:left; margin:0; width:16px; height:16px; padding:2px 3px}
+.fade {opacity:0.15;}</style>
+</head>
+
+<body>
+<div class="box-container">
+<div class="title">
+<span class="titleMonth">August</span><span class="titleYear">2019</span>
+</div>
+<span class="vin medium"><b>Mars</b> - 5YJ3E1EA3JFXXXXXX - 2019.28.2 320fba0</span>
+<span class="update medium">Last Updated: 2019-08-07 01:45 PM</span>
+<div class="dayOfWeek" style="left:0.00px; top:60.00px">
+<span class="titleDayLabel">Sun</span>
+</div>
+<div class="dayOfWeek" style="left:129.00px; top:60.00px">
+<span class="titleDayLabel">Mon</span>
+</div>
+<div class="dayOfWeek" style="left:258.00px; top:60.00px">
+<span class="titleDayLabel">Tue</span>
+</div>
+<div class="dayOfWeek" style="left:387.00px; top:60.00px">
+<span class="titleDayLabel">Wed</span>
+</div>
+<div class="dayOfWeek" style="left:516.00px; top:60.00px">
+<span class="titleDayLabel">Thu</span>
+</div>
+<div class="dayOfWeek" style="left:645.00px; top:60.00px">
+<span class="titleDayLabel">Fri</span>
+</div>
+<div class="dayOfWeek" style="left:774.00px; top:60.00px">
+<span class="titleDayLabel">Sat</span>
+</div>
+<div class="box" style="left:0.00px; top:90.00px">
+<span class="dayLabel otherMonth">Jul 14</span>
+</div>
+<div class="box" style="left:129.00px; top:90.00px">
+<span class="dayLabel otherMonth">15</span>
+</div>
+<div class="box" style="left:258.00px; top:90.00px">
+<span class="dayLabel otherMonth">16</span>
+</div>
+<div class="box" style="left:387.00px; top:90.00px">
+<span class="dayLabel otherMonth">17</span>
+</div>
+<div class="box" style="left:516.00px; top:90.00px">
+<span class="dayLabel otherMonth">18</span>
+</div>
+<div class="box" style="left:645.00px; top:90.00px">
+<span class="dayLabel otherMonth">19</span>
+</div>
+<div class="box" style="left:774.00px; top:90.00px">
+<span class="dayLabel otherMonth">20</span>
+</div>
+<div class="box" style="left:0.00px; top:231.00px">
+<span class="dayLabel otherMonth">21</span>
+</div>
+<div class="box" style="left:129.00px; top:231.00px">
+<span class="dayLabel otherMonth">22</span>
+</div>
+<div class="box" style="left:258.00px; top:231.00px">
+<span class="dayLabel otherMonth">23</span>
+</div>
+<div class="box" style="left:387.00px; top:231.00px">
+<span class="dayLabel otherMonth">24</span>
+<div class="chargeLevel" style="height:65%"></div>
+<div class="iconBar">
+<img class="icon" src="blob/wheel.png">
+<img class="icon fade" src="blob/charge.png">
+<img class="icon" src="blob/up.png">
+</div>
+<div class="info">
+<span class="textInfo large">65%</span>
+<span class="textInfo medium">11:15 PM</span>
+<span class="textInfo medium">+17.6 mi (37)</span>
+<span class="textInfo medium">8639.0 mi</span>
+</div>
+</div>
+<div class="box" style="left:516.00px; top:231.00px">
+<span class="dayLabel otherMonth">25</span>
+<div class="chargeLevel lowCharge" style="height:58%"></div>
+<div class="iconBar">
+<img class="icon" src="blob/wheel.png">
+<img class="icon fade" src="blob/charge.png">
+<img class="icon fade" src="blob/up.png">
+</div>
+<div class="info">
+<span class="textInfo large">58%</span>
+<span class="textInfo medium">9:30 PM</span>
+<span class="textInfo medium">+12.3 mi (24)</span>
+<span class="textInfo medium">8651.3 mi</span>
+</div>
+</div>
+<div class="box" style="left:645.00px; top:231.00px">
+<span class="dayLabel otherMonth">26</span>
+<div class="chargeLevel" style="height:85%"></div>
+<div class="iconBar">
+<img class="icon" src="blob/wheel.png">
+<img class="icon" src="blob/charge.png">
+<img class="icon fade" src="blob/up.png">
+</div>
+<div class="info">
+<span class="textInfo large">85%</span>
+<span class="textInfo medium">8:45 PM</span>
+<span class="textInfo medium">+18.2 mi (35)</span>
+<span class="textInfo medium">8669.5 mi</span>
+</div>
+</div>
+<div class="box" style="left:774.00px; top:231.00px">
+<span class="dayLabel otherMonth">27</span>
+<div class="chargeLevel" style="height:79%"></div>
+<div class="iconBar">
+<img class="icon" src="blob/wheel.png">
+<img class="icon fade" src="blob/charge.png">
+<img class="icon fade" src="blob/up.png">
+</div>
+<div class="info">
+<span class="textInfo large">79%</span>
+<span class="textInfo medium">1:45 PM</span>
+<span class="textInfo medium">+12.9 mi (7)</span>
+<span class="textInfo medium">8682.4 mi</span>
+</div>
+</div>
+<div class="box" style="left:0.00px; top:372.00px">
+<span class="dayLabel otherMonth">28</span>
+<div class="chargeLevel" style="height:79%"></div>
+<div class="iconBar">
+<img class="icon fade" src="blob/wheel.png">
+<img class="icon fade" src="blob/charge.png">
+<img class="icon fade" src="blob/up.png">
+</div>
+<div class="info">
+<span class="textInfo large">79%</span>
+<span class="textInfo medium">5:45 PM</span>
+<span class="textInfo medium">+0.0 mi (6)</span>
+<span class="textInfo medium">8682.4 mi</span>
+</div>
+</div>
+<div class="box" style="left:129.00px; top:372.00px">
+<span class="dayLabel otherMonth">29</span>
+<div class="chargeLevel" style="height:83%"></div>
+<div class="iconBar">
+<img class="icon" src="blob/wheel.png">
+<img class="icon" src="blob/charge.png">
+<img class="icon fade" src="blob/up.png">
+</div>
+<div class="info">
+<span class="textInfo large">83%</span>
+<span class="textInfo medium">8:00 PM</span>
+<span class="textInfo medium">+17.1 mi (41)</span>
+<span class="textInfo medium">8699.5 mi</span>
+</div>
+</div>
+<div class="box" style="left:258.00px; top:372.00px">
+<span class="dayLabel otherMonth">30</span>
+<div class="chargeLevel" style="height:71%"></div>
+<div class="iconBar">
+<img class="icon" src="blob/wheel.png">
+<img class="icon fade" src="blob/charge.png">
+<img class="icon fade" src="blob/up.png">
+</div>
+<div class="info">
+<span class="textInfo large">71%</span>
+<span class="textInfo medium">11:00 PM</span>
+<span class="textInfo medium">+26.3 mi (35)</span>
+<span class="textInfo medium">8725.8 mi</span>
+</div>
+</div>
+<div class="box" style="left:387.00px; top:372.00px">
+<span class="dayLabel otherMonth">31</span>
+<div class="chargeLevel" style="height:70%"></div>
+<div class="iconBar">
+<img class="icon" src="blob/wheel.png">
+<img class="icon" src="blob/charge.png">
+<img class="icon fade" src="blob/up.png">
+</div>
+<div class="info">
+<span class="textInfo large">70%</span>
+<span class="textInfo medium">11:15 PM</span>
+<span class="textInfo medium">+26.7 mi (39)</span>
+<span class="textInfo medium">8752.5 mi</span>
+</div>
+</div>
+<div class="box" style="left:516.00px; top:372.00px">
+<span class="dayLabel">Aug 1</span>
+<div class="chargeLevel" style="height:63%"></div>
+<div class="iconBar">
+<img class="icon" src="blob/wheel.png">
+<img class="icon fade" src="blob/charge.png">
+<img class="icon fade" src="blob/up.png">
+</div>
+<div class="info">
+<span class="textInfo large">63%</span>
+<span class="textInfo medium">7:45 PM</span>
+<span class="textInfo medium">+12.6 mi (25)</span>
+<span class="textInfo medium">8765.1 mi</span>
+</div>
+</div>
+<div class="box" style="left:645.00px; top:372.00px">
+<span class="dayLabel">2</span>
+<div class="chargeLevel" style="height:86%"></div>
+<div class="iconBar">
+<img class="icon" src="blob/wheel.png">
+<img class="icon" src="blob/charge.png">
+<img class="icon fade" src="blob/up.png">
+</div>
+<div class="info">
+<span class="textInfo large">86%</span>
+<span class="textInfo medium">7:00 PM</span>
+<span class="textInfo medium">+12.7 mi (45)</span>
+<span class="textInfo medium">8777.9 mi</span>
+</div>
+</div>
+<div class="box" style="left:774.00px; top:372.00px">
+<span class="dayLabel">3</span>
+<div class="chargeLevel" style="height:85%"></div>
+<div class="iconBar">
+<img class="icon fade" src="blob/wheel.png">
+<img class="icon fade" src="blob/charge.png">
+<img class="icon fade" src="blob/up.png">
+</div>
+<div class="info">
+<span class="textInfo large">85%</span>
+<span class="textInfo medium">10:45 AM</span>
+<span class="textInfo medium">+0.0 mi (7)</span>
+<span class="textInfo medium">8777.9 mi</span>
+</div>
+</div>
+<div class="box" style="left:0.00px; top:513.00px">
+<span class="dayLabel">4</span>
+<div class="chargeLevel" style="height:83%"></div>
+<div class="iconBar">
+<img class="icon" src="blob/wheel.png">
+<img class="icon fade" src="blob/charge.png">
+<img class="icon fade" src="blob/up.png">
+</div>
+<div class="info">
+<span class="textInfo large">83%</span>
+<span class="textInfo medium">11:45 PM</span>
+<span class="textInfo medium">+4.5 mi (9)</span>
+<span class="textInfo medium">8782.4 mi</span>
+</div>
+</div>
+<div class="box" style="left:129.00px; top:513.00px">
+<span class="dayLabel">5</span>
+<div class="chargeLevel" style="height:84%"></div>
+<div class="iconBar">
+<img class="icon" src="blob/wheel.png">
+<img class="icon" src="blob/charge.png">
+<img class="icon fade" src="blob/up.png">
+</div>
+<div class="info">
+<span class="textInfo large">84%</span>
+<span class="textInfo medium">5:30 PM</span>
+<span class="textInfo medium">+15.9 mi (44)</span>
+<span class="textInfo medium">8798.3 mi</span>
+</div>
+</div>
+<div class="box" style="left:258.00px; top:513.00px">
+<span class="dayLabel">6</span>
+<div class="chargeLevel" style="height:78%"></div>
+<div class="iconBar">
+<img class="icon" src="blob/wheel.png">
+<img class="icon fade" src="blob/charge.png">
+<img class="icon" src="blob/up.png">
+</div>
+<div class="info">
+<span class="textInfo large">78%</span>
+<span class="textInfo medium">9:45 PM</span>
+<span class="textInfo medium">+11.9 mi (13)</span>
+<span class="textInfo medium">8810.2 mi</span>
+</div>
+</div>
+<div class="box" style="left:387.00px; top:513.00px">
+<span class="dayLabel today">7</span>
+<div class="chargeLevel" style="height:85%"></div>
+<div class="iconBar">
+<img class="icon" src="blob/wheel.png">
+<img class="icon" src="blob/charge.png">
+<img class="icon fade" src="blob/up.png">
+</div>
+<div class="info">
+<span class="textInfo large">85%</span>
+<span class="textInfo medium">1:45 PM</span>
+<span class="textInfo medium">+9.5 mi (26)</span>
+<span class="textInfo medium">8819.7 mi</span>
+</div>
+</div>
+<div class="box" style="left:516.00px; top:513.00px">
+<span class="dayLabel">8</span>
+</div>
+<div class="box" style="left:645.00px; top:513.00px">
+<span class="dayLabel">9</span>
+</div>
+<div class="box" style="left:774.00px; top:513.00px">
+<span class="dayLabel">10</span>
+</div>
+</div>
+</body>
+</html>
