@@ -1,8 +1,8 @@
 import os
-import json
 import glob
+import json
+import time
 import requests
-import datetime
 
 from .base import *
 from . import account
@@ -43,8 +43,7 @@ def getLatestDays(count=31):
             dd.append(data)
         d.append(dd)
         o = d[-1][-1]['charge_state']
-        t.append(datetime.datetime.fromtimestamp(o['timestamp'] / 1000))
-        # print('{} -> {}% {} {}'.format(os.path.basename(file), o['battery_level'], o['charging_state'], t[-1].weekday()))
+        t.append(o['timestamp'] / 1000)
     return t, d
 
 def getCalendarArray():
@@ -53,34 +52,31 @@ def getCalendarArray():
 
     # Find the 4th Sunday before present day
     t0 = t[-1]
-    oneday = datetime.timedelta(days=1)
-    while t0.weekday() != 6:
-        t0 -= oneday
-    t0 -= datetime.timedelta(days=21)
-    # display('{}'.format(t0.strftime('%Y/%m/%d %H:%M %A')))
+    while time.localtime(t0).tm_wday != 0:
+        t0 -= 86400
+    t0 -= 21 * 86400
 
     # The first Sunday
-    t0 = datetime.datetime.strptime(t0.strftime('%Y-%m-%d'), '%Y-%m-%d')
-    # display('{}'.format(t0.strftime('%Y/%m/%d %H:%M %A')))
+    t0 = time.mktime(time.strptime(time.strftime('%Y-%m-%d', time.localtime(t0)), '%Y-%m-%d'))
 
     # Group the weeks
+    k = 0
     tt = []
     dd = []
-    k = 0
 
     # Make a 4-week array of data arrays
     for i in range(4):
         tw = []
         dw = []
         for i in range(7):
-            if k < len(t) and t0 <= t[k] and t[k] < (t0 + oneday):
-                tw.append(t[k])
+            if k < len(t) and t0 <= t[k] and t[k] < (t0 + 86400):
+                tw.append(time.localtime(t[k]))
                 dw.append(d[k])
                 k += 1
             else:
-                tw.append(t0)
+                tw.append(time.localtime(t0))
                 dw.append(None)
-            t0 += oneday
+            t0 += 86400
         tt.append(tw)
         dd.append(dw)
 
@@ -112,7 +108,7 @@ def getDataInHTML(padding=0.05, showFadeIcon=True):
     day = next(d for d in week[::-1] if d is not None)
     d = day[-1]
 
-    lastUpdate = datetime.datetime.fromtimestamp(d['vehicle_state']['timestamp'] / 1000)
+    lastUpdate = time.localtime(d['vehicle_state']['timestamp'] / 1000)
 
     code = '<html>'
     code += '<head>\n'
@@ -154,20 +150,20 @@ def getDataInHTML(padding=0.05, showFadeIcon=True):
     code += '<body>\n'
     code += '<div class="box-container">\n'
     code += '<div class="title">\n'
-    code += '<span class="titleMonth">{}</span><span class="titleYear">{}</span>\n'.format(tt[-1][0].strftime('%B'), tt[0][0].strftime('%Y'))
+    code += '<span class="titleMonth">{}</span><span class="titleYear">{}</span>\n'.format(time.strftime('%B', tt[-1][0]), time.strftime('%Y', tt[-1][0]))
     code += '</div>\n'
     code += '<span class="vin medium"><b>{}</b> - {} - {}</span>\n'.format(d['vehicle_state']['vehicle_name'], d['vin'], d['vehicle_state']['car_version'])
-    code += '<span class="update medium">Last Updated: {}</span>\n'.format(lastUpdate.strftime('%Y-%m-%d %I:%M %p'))
+    code += '<span class="update medium">Last Updated: {}</span>\n'.format(time.strftime('%Y-%m-%d %I:%M %p', lastUpdate))
 
     # Use the latest day to decide the target month
-    targetMonth = tt[-1][0].month
+    targetMonth = tt[-1][0].tm_mon
 
     # The top row show days of the week
     for i in range(7):
         x = i * (w + o)
         y = 60
         code += '<div class="dayOfWeek" style="left:{:.2f}px; top:{:.2f}px">\n'.format(x, y)
-        code += '<span class="titleDayLabel">{}</span>\n'.format(tt[0][i].strftime('%a'))
+        code += '<span class="titleDayLabel">{}</span>\n'.format(time.strftime('%a', tt[0][i]))
         code += '</div>\n'
 
     # Odometer reading and software version from the previous day
@@ -175,8 +171,8 @@ def getDataInHTML(padding=0.05, showFadeIcon=True):
     s1 = None
 
     # Now we go through the days
-    mo = tt[0][0].month
-    todayString = datetime.datetime.today().strftime('%-d')
+    mo = tt[-1][0].tm_mon
+    todayString = time.strftime('%-d', time.localtime(time.time()))
     for j in range(len(tt)):
         for i in range(len(tt[j])):
             x = i * (w + o)
@@ -186,14 +182,12 @@ def getDataInHTML(padding=0.05, showFadeIcon=True):
             # A day container
             code += '<div class="box" style="left:{:.2f}px; top:{:.2f}px">\n'.format(x, y)
 
-            # code += '<div class="box">\n'
-
             # The day label.
-            if mo != tt[j][i].month:
-                mo = tt[j][i].month
-                dayString = '{}'.format(tt[j][i].strftime('%b %-d'))
+            if mo != tt[j][i].tm_mon:
+                mo = tt[j][i].tm_mon
+                dayString = time.strftime('%b %-d', tt[j][i])
             else:
-                dayString = '{}'.format(tt[j][i].strftime('%-d'))
+                dayString = time.strftime('%-d', tt[j][i])
             elementClass = ''
             if targetMonth != mo:
                 elementClass += ' otherMonth'
@@ -257,7 +251,7 @@ def getDataInHTML(padding=0.05, showFadeIcon=True):
                 # Lines of information
                 code += '<div class="info">\n'
                 code += '<span class="textInfo large">{}%</span>\n'.format(chargeLevel)
-                code += '<span class="textInfo medium">{}</span>\n'.format(tt[j][i].strftime('%-I:%M %p'))
+                code += '<span class="textInfo medium">{}</span>\n'.format(time.strftime('%-I:%M %p', tt[j][i]))
                 code += '<span class="textInfo medium">{:+.1f} mi ({})</span>\n'.format(delta_o, len(dayArray))
                 code += '<span class="textInfo medium">{:.1f} mi</span>\n'.format(o0)
                 code += '</div>\n'
