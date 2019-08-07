@@ -66,6 +66,8 @@ def prettyAgeString(timestamp, showSeconds=True):
     return '{} ({})'.format(t.strftime('%Y%m%d-%H%M%S'), ageString)
 
 def c2f(c):
+    if c is None:
+        return None
     return c * 1.8 + 32
 
 #
@@ -116,9 +118,15 @@ if __name__ == '__main__':
     showKeyValue(data['charge_state'], 'battery_level', '%')                          # current battery state of charge
     showKeyValue(data['climate_state'], 'is_climate_on')                              # climate control
     tc = data['climate_state']['inside_temp']                                         # interior temperature
-    showVariable('inside_temp', '{:.1f}°C / {:.1f}°F'.format(tc, c2f(tc)))            # show temperature in C & F
+    if tc is None:
+        showVariable('inside_temp', 'None', boolColor)                                # show temperature in C & F
+    else:
+        showVariable('inside_temp', '{:.1f}°C / {:.1f}°F'.format(tc, c2f(tc)))        # show temperature in C & F
     tc = data['climate_state']['outside_temp']                                        # exterior temperature
-    showVariable('outside_temp', '{:.1f}°C / {:.1f}°F'.format(tc, c2f(tc)))           # show temperature in C & F
+    if tc is None:
+        showVariable('outside_temp', 'None', boolColor)                               # show temperature in C & F
+    else:
+        showVariable('outside_temp', '{:.1f}°C / {:.1f}°F'.format(tc, c2f(tc)))       # show temperature in C & F
     showKeyValue(data['charge_state'], 'charging_state')                              # charge state (disconnected, charging, etc.)
     if data['charge_state']['charging_state'] == "Charging":
         showKeyValue(data['charge_state'], 'charger_power', ' kW')                    # charge power

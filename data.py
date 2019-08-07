@@ -168,6 +168,9 @@ def getDataInHTML(padding=0.05):
     # Odometer reading from the previous day
     o1 = 0.0
 
+    # Software version
+    s1 = ''
+
     # Now we go through the days
     mo = tt[0][0].month
     todayString = datetime.datetime.today().strftime('%-d')
@@ -196,7 +199,7 @@ def getDataInHTML(padding=0.05):
             
             code += '<span class="dayLabel{}">{}</span>\n'.format(elementClass, dayString)
 
-            # Skip the day if there is no data
+            # Process the day if there is data
             if dd[j][i]:
                 # Battery level
                 dayArray = dd[j][i]
@@ -220,12 +223,23 @@ def getDataInHTML(padding=0.05):
                 # minTemp = np.nanmin(temp) * 9 / 5 + 32.0
                 # maxTemp = np.nanmax(temp) * 9 / 5 + 32.0
 
+                # Software version
+                if len(s1) == 0:
+                    s1 = dayArray[0]['vehicle_state']['car_version']
+                s0 = dayArray[-1]['vehicle_state']['car_version']
+                if s0 != s1:
+                    carUpdated = True
+                else:
+                    carUpdated = False
+
                 # Icon bar using the information derived earlier
                 code += '<div class="iconBar">\n'
                 if delta_o > 1.0:
                     code += '<img class="icon" src="blob/wheel.png">\n'
                 if any([d['charge_state']['charging_state'] == 'Charging' for d in dayArray]):
                     code += '<img class="icon" src="blob/charge-0.png">\n'
+                if carUpdated:
+                    code += '<img class="icon" src="blob/upgrade.png">\n'
                 code += '</div>\n'
 
                 # Lines of information
