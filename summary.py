@@ -1,10 +1,10 @@
 #!/usr/local/bin/python
 
-__version__ = '1.0'
+__version__ = '1.0.1'
 
 import os
 import glob
-import datetime
+import time
 import argparse
 
 import tesla
@@ -27,15 +27,15 @@ def showKeyValue(obj, key, unit=""):
     showVariable(key, '{}{}'.format(value, unit), color)
 
 def prettyAgeString(timestamp, showSeconds=True):
-    now = datetime.datetime.now()
+    now = time.time()
     age = now - timestamp
     ageString = ''
-    d = age.days
+    d = int(age / 86400)
     if d > 0:
         ageString += '{} day'.format(d)
         if d > 1:
             ageString += 's'
-    s = age.seconds
+    s = age - d * 86400
     h = int(s / 3600)
     if h > 0:
         if len(ageString):
@@ -55,14 +55,14 @@ def prettyAgeString(timestamp, showSeconds=True):
         if s > 0:
             if len(ageString):
                 ageString += ' '
-            ageString += '{} second'.format(s)
+            ageString += '{:.0f} second'.format(s)
             if s > 1:
                 ageString += 's'
     if len(ageString):
         ageString += ' ago'
     else:
         ageString = 'now'
-    return '{} ({})'.format(t.strftime('%Y%m%d-%H%M%S'), ageString)
+    return '{} ({})'.format(time.strftime('%Y%m%d-%H%M%S', time.localtime(timestamp)), ageString)
 
 def c2f(c):
     if c is None:
@@ -107,7 +107,7 @@ if __name__ == '__main__':
         import pprint
         pprint.pprint(data)
 
-    t = datetime.datetime.fromtimestamp(data['charge_state']['timestamp'] / 1000)
+    t = data['charge_state']['timestamp'] / 1000
     showVariable('timestamp', prettyAgeString(t))
     fullRange = data['charge_state']['battery_range'] / data['charge_state']['battery_level'] * 100.0
     showVariable('projected_full_battery_range', '{:.1f} mi'.format(fullRange), 51)   # my projected range at 100% charge
