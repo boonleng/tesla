@@ -8,6 +8,9 @@
 
     Updates
 
+    1.1    - 8/6/2019
+           - Moved a lot of reusable functions to data.py
+
     1.1    - 8/5/2019
            - Moved a lot of reusable functions to foundation.py
 
@@ -19,7 +22,7 @@
 
 """
 
-__version__ = '1.1'
+__version__ = '1.2'
 
 import os
 import time
@@ -27,6 +30,7 @@ import json
 import argparse
 
 import foundation
+import data
 
 
 #
@@ -58,7 +62,7 @@ if __name__ == '__main__':
     foundation.logger.debug('--- Started ----------')
     foundation.logger.info('Tesla Data Logger {}'.format(__version__))
 
-    dat = foundation.requestData()
+    dat = data.requestData()
 
     if dat is None:
         foundation.logger.info('Vehicle is sleeping')
@@ -79,7 +83,7 @@ if __name__ == '__main__':
             with open(filename, 'w') as fid:
                 fid.write(jsonString)
                 fid.close()
-            code = foundation.getDataInHTML()
+            code = data.getDataInHTML()
             with open(os.path.expanduser('~/Developer/tesla/calendar.html'), 'w') as fid:
                 fid.write(code)
                 fid.close()
