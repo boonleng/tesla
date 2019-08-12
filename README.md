@@ -16,7 +16,7 @@ I am using this on a macOS computer and I usually put all open-source software u
 git clone https://github.com/boonleng/tesla.git
 ```
 
-Run the retrieval script once.
+Go in to the ~/Developer/tesla folder, run the retrieval script once.
 ```shell
 getStat.py -v -w
 ```
@@ -24,7 +24,9 @@ or
 ```shell
 python getStat.py -v -w
 ```
-which will prompt you for your Tesla account username and password, which will be stored for future use. Don't worry, they are not stored in plain text anywhere. The macOS has a secure way to store this. You can use the Keychain Access utility to remove it if you decided so, just search for `owner-api.teslamotors.com`. The software has not been tested extensively so it is very likely to contain bugs. If you encounter any, please let me know and I'll try my best to fix them.
+which will prompt you for your Tesla account username and password during the first run. The username and password will be stored for future use. Don't worry, they are not stored in plain text or insecurely. The macOS has a secure way to store these and that's what is used here. You can use the Keychain Access utility to remove them if you decided to do so, just search for `owner-api.teslamotors.com`.
+
+Disclaimer: There is no warranty on this. Also, the software has not been tested extensively so it is very likely to contain bugs. If you encounter any, please let me know and I'll try my best to fix them.
 
 ## Cronjob
 
