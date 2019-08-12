@@ -132,7 +132,12 @@ def getDataInHTML(padding=0.05, showFadeIcon=True):
     code += '.titleDayLabel {font-size:1.2em}\n'
     code += '.otherMonth {color:#aaa;}\n'
     code += '.chargeLevel {{display:block; position:absolute; bottom:0; width:{}%; background-color:#88ff00; z-index:0}}\n'.format(100)
-    code += '.lowCharge {background-color:#ffcc00}\n'
+    code += '.charge5 {background-color:#88ff00}\n'
+    code += '.charge4 {background-color:#c3ee00}\n'
+    code += '.charge3 {background-color:#ffdd00}\n'
+    code += '.charge2 {background-color:#ffa133}\n'
+    code += '.charge1 {background-color:#ff6666}\n'
+    code += '.charge0 {background-color:#ff4499}\n'
     code += '\n'
     code += '.info {{display:block; position:absolute; bottom:8%; width:{}%; margin:0 {}%; padding:0; text-align:center}}\n'.format(100.0 * (1.0 - padding), 50.0 * padding)
     code += '.textInfo {display:block; width:100%; margin-bottom:0.3em; line-height:1.0em}\n'
@@ -201,10 +206,11 @@ def getDataInHTML(padding=0.05, showFadeIcon=True):
                 # Battery level
                 dayArray = dd[j][i]
                 chargeLevel = dayArray[-1]['charge_state']['battery_level']
-                if chargeLevel <= 60.0:
-                    elementClass = ' lowCharge'
-                else:
-                    elementClass = ''
+                elementClass = ''
+                #r = tt[j][i].tm_wday
+                r = int(chargeLevel / 10)
+                if r <= 5:
+                   elementClass += ' charge{}'.format(r)
                 code += '<div class="chargeLevel{}" style="height:{}%"></div>\n'.format(elementClass, chargeLevel)
 
                 # Calculate total miles driven

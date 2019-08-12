@@ -112,7 +112,9 @@ if __name__ == '__main__':
     t = data['charge_state']['timestamp'] / 1000
     showVariable('timestamp', prettyAgeString(t))
     fullRange = data['charge_state']['battery_range'] / data['charge_state']['battery_level'] * 100.0
-    showVariable('projected_full_battery_range', '{:.1f} mi'.format(fullRange), otherColor)     # my projected range at 100% charge
+    fullRangeEst = fullRange / data['charge_state']['ideal_battery_range'] * data['charge_state']['est_battery_range']
+    rangeString = '{:.1f} / {:.1f} mi'.format(fullRange, fullRangeEst)
+    showVariable('projected_full_battery_range', rangeString, otherColor)                       # my projected range at 100% charge & from est
     showKeyValue(data['charge_state'], 'ideal_battery_range', ' mi')                            # ideal range without degradation
     showKeyValue(data['charge_state'], 'est_battery_range', ' mi')                              # range estimated from recent driving
     showKeyValue(data['charge_state'], 'battery_range', ' mi')                                  # current battery range
