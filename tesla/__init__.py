@@ -104,11 +104,14 @@ def getDataInHTML(padding=0.05, showFadeIcon=True):
     figsize = (7 * (w + o) - o + 1, len(tt) * (h + o) - o + 90 + 1)
 
     # Find the first datalog that is valid
-    week = next(w for w in dd[::-1] if any(w))
-    day = next(d for d in week[::-1] if d is not None)
-    d = day[-1]
+    if len([w for w in dd[::-1] if any(w)]):
+        week = next(w for w in dd[::-1] if any(w))
+        day = next(d for d in week[::-1] if d is not None)
+        d = day[-1]
 
-    lastUpdate = time.localtime(d['vehicle_state']['timestamp'] / 1000)
+        lastUpdate = time.localtime(d['vehicle_state']['timestamp'] / 1000)
+    else:
+        lastUpdate = None
 
     code = '<html>'
     code += '<head>\n'
@@ -157,8 +160,13 @@ def getDataInHTML(padding=0.05, showFadeIcon=True):
     code += '<div class="title">\n'
     code += '<span class="titleMonth">{}</span><span class="titleYear">{}</span>\n'.format(time.strftime('%B', tt[-1][0]), time.strftime('%Y', tt[-1][0]))
     code += '</div>\n'
-    code += '<span class="vin medium"><b>{}</b> - {} - {}</span>\n'.format(d['vehicle_state']['vehicle_name'], d['vin'], d['vehicle_state']['car_version'])
-    code += '<span class="update medium">Last Updated: {}</span>\n'.format(time.strftime('%Y-%m-%d %I:%M %p', lastUpdate))
+    if lastUpdate:
+        code += '<span class="vin medium"><b>{}</b> - {} - {}</span>\n'.format(d['vehicle_state']['vehicle_name'], d['vin'], d['vehicle_state']['car_version'])
+        code += '<span class="update medium">Last Updated: {}</span>\n'.format(time.strftime('%Y-%m-%d %I:%M %p', lastUpdate))
+    else:
+        code += '<span class="vin medium"><b>{}</b> - {} - {}</span>\n'.format('VEHICLE_NAME', '5YJ3E1EA3JF000000', '2018.36.2 ac4a215')
+        code += '<span class="update medium">Last Updated: -</span>\n'
+        print('Error. No valid days')
 
     # Use the latest day to decide the target month
     targetMonth = tt[-1][0].tm_mon
