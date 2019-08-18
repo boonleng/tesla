@@ -51,9 +51,13 @@ def getCalendarArray():
     t, d = getLatestDays()
 
     # Find the 4th Sunday before present day
+    k = 0
     t0 = t[-1]
-    while time.localtime(t0).tm_wday != 6:
+    while time.localtime(t0).tm_wday != 6 and k < 7:
         t0 -= 86400
+        k += 1
+    if k == 7:
+        print('Error. Could not find a Sunday after 7 days. Huh?')
     t0 -= 21 * 86400
 
     # The first Sunday
@@ -63,6 +67,10 @@ def getCalendarArray():
     k = 0
     tt = []
     dd = []
+
+    # Roll forward if the data starts before the first Sunday
+    while k < 7 and k < len(t) and t[k] < t0:
+        k += 1
 
     # Make a 4-week array of data arrays
     for i in range(4):
