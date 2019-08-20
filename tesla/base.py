@@ -37,6 +37,6 @@ for folder in folders:
 if logfile is None:
     logfile = 'messages.log'
 logging.basicConfig(filename=logfile, level=logging.INFO, format='%(asctime)s %(message)s', datefmt='%H:%M:%S')
-logging.Formatter.converter = time.gmtime
+logging.Formatter.converter = time.localtime
 
 logger.setLevel(logging.INFO)
