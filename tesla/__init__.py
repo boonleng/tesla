@@ -73,10 +73,10 @@ def getCalendarArray():
         k += 1
 
     # Make a 4-week array of data arrays
-    for i in range(4):
+    for _ in range(4):
         tw = []
         dw = []
-        for i in range(7):
+        for _ in range(7):
             if k < len(t) and t0 <= t[k] and t[k] < (t0 + 86400):
                 tw.append(time.localtime(t[k]))
                 dw.append(d[k])
