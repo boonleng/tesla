@@ -126,4 +126,4 @@ def refreshToken():
         print(config)
         with open(base.rcFile, 'w') as fid:
             config.write(fid)
-
+        print(token)
