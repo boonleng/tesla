@@ -27,7 +27,7 @@ def objFromFile(filename):
         fobj.close()
     return json.loads(json_str)
 
-def getLatestDays(count=31):
+def getLatestDays(count=28):
     folders = glob.glob('{}/2*'.format(base.dataLogHome))
     folders.sort()
 
@@ -46,9 +46,9 @@ def getLatestDays(count=31):
         t.append(o['timestamp'] / 1000)
     return t, d
 
-def getCalendarArray():
+def getCalendarArray(count=5):
     # Get the data from the latest 31 days
-    t, d = getLatestDays()
+    t, d = getLatestDays(count * 7)
 
     # Find the 4th Sunday before present day
     k = 0
@@ -58,7 +58,7 @@ def getCalendarArray():
         k += 1
     if k == 7:
         print('Error. Could not find a Sunday after 7 days. Huh?')
-    t0 -= 21 * 86400
+    t0 -= (count - 1) * 7 * 86400
 
     # The first Sunday
     t0 = time.mktime(time.strptime(time.strftime('%Y-%m-%d', time.localtime(t0)), '%Y-%m-%d'))
@@ -72,8 +72,8 @@ def getCalendarArray():
     while k < 7 and k < len(t) and t[k] < t0:
         k += 1
 
-    # Make a 4-week array of data arrays
-    for _ in range(4):
+    # Make a (count)-week array of data arrays
+    for _ in range(count):
         tw = []
         dw = []
         for _ in range(7):
@@ -90,9 +90,9 @@ def getCalendarArray():
 
     return tt, dd
 
-def getDataInHTML(padding=0.05, showFadeIcon=True):
+def getDataInHTML(count=4, padding=0.05, showFadeIcon=True):
 
-    tt, dd = getCalendarArray()
+    tt, dd = getCalendarArray(count)
 
     # Do this to ensure custom fonts are available
     import tesla.font
