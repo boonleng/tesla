@@ -1,4 +1,5 @@
 import os
+import time
 import json
 import requests
 import configparser
@@ -92,10 +93,19 @@ def getConfig():
         base.logger.exception('Bad config file. Try removing it and rerun this script.')
         return None
 
+    # Gather the cars
     cars = []
     for sec in config.sections():
         if sec not in ['user', 'token']:
             cars.append(dict(config[sec]))
+
+    # Check for the expiration time
+    now = time.mktime(time.localtime())
+    days = (float(config['token']['created_at']) + float(config['token']['expires_in']) - now) / 86400
+    if days <= 7:
+        print('Renewing token ...')
+        refreshToken()
+
     return {'username':config['user']['username'], 'token':dict(config['token']), 'cars':cars}
 
 def refreshToken():
@@ -118,12 +128,35 @@ def refreshToken():
         'User-Agent': 'Learning',
         'Content-Type': 'application/json'
     }
-    #r = requests.post(url, data=json.dumps(payload), headers=headers)
-    if r.status_code == 200:
-        token = r.json()
-        # Update config
-        config['token'] = r.json()
-        print(config)
-        with open(base.rcFile, 'w') as fid:
-            config.write(fid)
-        print(token)
+    r = requests.post(url, data=json.dumps(payload), headers=headers)
+    if r.status_code != 200:
+        base.logger.exception('Unable to retrieve token. r = {}'.format(r.status_code))
+        return None
+    token = r.json()
+
+    # Update the config file
+    config['token'] = token
+    with open(base.rcFile, 'w') as fid:
+        config.write(fid)
+    print(token)
+    
+    return config
+
+def updateToken():
+    config = configparser.ConfigParser()
+    try:
+        config.read(base.rcFile)
+    except configparser.ParsingError as e:
+        base.logger.exception('Bad config file.')
+        raise ConfigError from e
+    new_token = {
+        'access_token': 'baf32d082a1221014f8fe57a36872e679d80d962a5ad6c9e3ead1a784e088ac6',
+        'token_type': 'bearer',
+        'expires_in': '3888000',
+        'refresh_token': '4add2df5399a0a61775aaadc3cb5dfae0889a2e4eee24febd9914c9af8713b07',
+        'created_at': '1566761350'
+    }
+    config['token'] = new_token
+    with open(base.rcFile, 'w') as fid:
+        config.write(fid)
+    return config
