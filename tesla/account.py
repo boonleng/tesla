@@ -6,6 +6,14 @@ import configparser
 
 from . import base
 
+def configParserToConfig(config):
+    # Gather the cars
+    cars = []
+    for sec in config.sections():
+        if sec not in ['user', 'token']:
+            cars.append(dict(config[sec]))
+    return {'username':config['user']['username'], 'token':dict(config['token']), 'cars':cars}
+
 def getConfig():
     if not os.path.exists(base.rcFile):
         base.logger.info('No configuration file. Setting up ...')
@@ -93,12 +101,6 @@ def getConfig():
         base.logger.exception('Bad config file. Try removing it and rerun this script.')
         return None
 
-    # Gather the cars
-    cars = []
-    for sec in config.sections():
-        if sec not in ['user', 'token']:
-            cars.append(dict(config[sec]))
-
     # Check for the expiration time
     now = time.mktime(time.localtime())
     days = (float(config['token']['created_at']) + float(config['token']['expires_in']) - now) / 86400
@@ -106,7 +108,7 @@ def getConfig():
         print('Renewing token ...')
         refreshToken()
 
-    return {'username':config['user']['username'], 'token':dict(config['token']), 'cars':cars}
+    return configParserToConfig(config)
 
 def refreshToken():
     # Load the current configuration
@@ -138,25 +140,58 @@ def refreshToken():
     config['token'] = token
     with open(base.rcFile, 'w') as fid:
         config.write(fid)
-    print(token)
-    
     return config
 
-def updateToken():
+# def updateToken():
+#     config = configparser.ConfigParser()
+#     try:
+#         config.read(base.rcFile)
+#     except configparser.ParsingError as e:
+#         base.logger.exception('Bad config file.')
+#         raise ConfigError from e
+#     new_token = {
+#         'access_token': 'baf32d082a1221014f8fe57a36872e679d80d962a5ad6c9e3ead1a784e088ac6',
+#         'token_type': 'bearer',
+#         'expires_in': '3888000',
+#         'refresh_token': '4add2df5399a0a61775aaadc3cb5dfae0889a2e4eee24febd9914c9af8713b07',
+#         'created_at': '1566761350'
+#     }
+#     config['token'] = new_token
+#     with open(base.rcFile, 'w') as fid:
+#         config.write(fid)
+#     return config
+
+def updateCars():
     config = configparser.ConfigParser()
     try:
         config.read(base.rcFile)
     except configparser.ParsingError as e:
         base.logger.exception('Bad config file.')
         raise ConfigError from e
-    new_token = {
-        'access_token': 'baf32d082a1221014f8fe57a36872e679d80d962a5ad6c9e3ead1a784e088ac6',
-        'token_type': 'bearer',
-        'expires_in': '3888000',
-        'refresh_token': '4add2df5399a0a61775aaadc3cb5dfae0889a2e4eee24febd9914c9af8713b07',
-        'created_at': '1566761350'
+    # Retrieve a list of vehicles
+    url = 'https://owner-api.teslamotors.com/api/1/vehicles'
+    headers = {
+        'Authorization': 'Bearer {}'.format(config['token']['access_token'])
     }
-    config['token'] = new_token
-    with open(base.rcFile, 'w') as fid:
-        config.write(fid)
-    return config
+    r = requests.get(url, headers=headers)
+    cars = None
+    if r.status_code == 200:
+        cars = r.json()['response']
+        # Copy over the old config but update the cars
+        newConfig = configparser.ConfigParser()
+        newConfig.add_section('user')
+        newConfig.add_section('token')
+        newConfig['user'] = dict(config['user'])
+        newConfig['token'] = dict(config['token'])
+        for car in cars:
+            key = car['vin']
+            newConfig.add_section(key)
+            print('id = {}'.format(car['id']))
+            newConfig[key] = {'id': car['id'],
+                              'vid': car['vehicle_id'],
+                              'name': car['display_name']}
+        with open('testconfig', 'w') as fid:
+            newConfig.write(fid)
+    else:
+        base.logger.exception('Unable to retrieve list of vehicles.')
+    return configParserToConfig(newConfig)

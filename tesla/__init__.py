@@ -9,7 +9,7 @@ from . import account
 
 config = account.getConfig()
 
-def requestData(index=0):
+def requestData(index=0, retry=True):
     vehicleId = config['cars'][index]['id']
     url = 'https://owner-api.teslamotors.com/api/1/vehicles/{}/vehicle_data'.format(vehicleId)
     headers = {
@@ -18,6 +18,10 @@ def requestData(index=0):
     res = requests.get(url, headers=headers)
     if res.status_code == 200:
         return res.json()['response']
+    elif res.status_code == 404 and retry:
+        base.logger.info('Vechicle not found. Try refreshing cars... r = {}'.format(res.status_code))
+        account.updateCars()
+        return requestData(index=index, retry=False)
     base.logger.info('Vechicle connection error. r = {}'.format(res.status_code))
     return None
 
