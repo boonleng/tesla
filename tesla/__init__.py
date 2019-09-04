@@ -1,3 +1,26 @@
+__version__ = '0.9'
+
+"""
+    Tesla API Bridge
+
+    @author: Boonleng Cheong
+
+    Updates
+
+    0.9    - 9/4/2019
+           - Updated logging
+           - Logs are now in local time
+           - Added refreshToken()
+           - Added refreshCars()
+           - Improved handling of empty data logs
+
+    0.5    - 8/7/2019
+           - Decided to mave all modules into ./tesla
+
+    0.1    - 7/21/2019
+           - Started
+"""
+
 import os
 import glob
 import json
@@ -19,10 +42,10 @@ def requestData(index=0, retry=True):
     if res.status_code == 200:
         return res.json()['response']
     elif res.status_code == 404 and retry:
-        base.logger.info('Vechicle not found. Try refreshing cars... r = {}'.format(res.status_code))
-        account.updateCars()
+        base.logger.exception('Vechicle not found. Try refreshing cars... r = {}'.format(res.status_code))
+        account.refreshCars()
         return requestData(index=index, retry=False)
-    base.logger.info('Vechicle connection error. r = {}'.format(res.status_code))
+    base.logger.exception('Vechicle connection error. r = {}'.format(res.status_code))
     return None
 
 def objFromFile(filename):

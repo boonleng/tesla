@@ -1,6 +1,6 @@
 #!/usr/local/bin/python3
 
-__version__ = '1.2.1'
+__version__ = '1.3'
 
 """
     getStat.py
@@ -9,6 +9,11 @@ __version__ = '1.2.1'
     @author: Boonleng Cheong
 
     Updates
+
+    1.3.   - 9/4/2019
+           - Updated logging
+           - Logs are now in local time
+           - Improved handling of empty data logs
 
     1.2.1  - 8/7/2019
            - Decided to mave all modules into ./tesla

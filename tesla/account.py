@@ -6,6 +6,7 @@ import configparser
 
 from . import base
 
+
 def configParserToConfig(config):
     # Gather the cars
     cars = []
@@ -13,6 +14,7 @@ def configParserToConfig(config):
         if sec not in ['user', 'token']:
             cars.append(dict(config[sec]))
     return {'username':config['user']['username'], 'token':dict(config['token']), 'cars':cars}
+
 
 def getConfig():
     if not os.path.exists(base.rcFile):
@@ -105,19 +107,26 @@ def getConfig():
     now = time.mktime(time.localtime())
     days = (float(config['token']['created_at']) + float(config['token']['expires_in']) - now) / 86400
     if days <= 7:
-        print('Renewing token ...')
+        logger.info('Token expiring in {:.1f} days. Refreshing ...'.format(days))
         refreshToken()
 
     return configParserToConfig(config)
 
+
+def tokenAge():
+    config = getConfig()
+    now = time.mktime(time.localtime())
+    return (now - float(config['token']['created_at'])) / 86400
+
+
+def tokenDaysLeft():
+    config = getConfig()
+    now = time.mktime(time.localtime())
+    return (float(config['token']['created_at']) + float(config['token']['expires_in']) - now) / 86400
+
+
 def refreshToken():
-    # Load the current configuration
-    config = configparser.ConfigParser()
-    try:
-        config.read(base.rcFile)
-    except configparser.ParsingError as e:
-        base.logger.exception('Bad config file.')
-        raise ConfigError from e
+    config = getConfig()
     url = 'https://{}/oauth/token'.format(base.site)
     payload = {
         'grant_type': 'refresh_token',
@@ -136,40 +145,28 @@ def refreshToken():
         return None
     token = r.json()
 
-    # Update the config file
-    config['token'] = token
+    # Copy over the old config but update the token
+    newConfig = configparser.ConfigParser()
+    newConfig.add_section('user')
+    newConfig.add_section('token')
+    newConfig['user'] = config['user']
+    newConfig['token'] = token
+    # Gather the cars
+    for sec in config.sections():
+        if sec not in ['user', 'token']:
+            newConfig.add_section(sec)
+            newConfig[sec] = config[sec]
     with open(base.rcFile, 'w') as fid:
-        config.write(fid)
+        newConfig.write(fid)
+    now = time.mktime(time.localtime())
+    days = (float(config['token']['created_at']) + float(config['token']['expires_in']) - now) / 86400
+    logger.info('Token refreshed. New token will last another {:.1f} days.'.format(days))
     return config
 
-# def updateToken():
-#     config = configparser.ConfigParser()
-#     try:
-#         config.read(base.rcFile)
-#     except configparser.ParsingError as e:
-#         base.logger.exception('Bad config file.')
-#         raise ConfigError from e
-#     new_token = {
-#         'access_token': 'baf32d082a1221014f8fe57a36872e679d80d962a5ad6c9e3ead1a784e088ac6',
-#         'token_type': 'bearer',
-#         'expires_in': '3888000',
-#         'refresh_token': '4add2df5399a0a61775aaadc3cb5dfae0889a2e4eee24febd9914c9af8713b07',
-#         'created_at': '1566761350'
-#     }
-#     config['token'] = new_token
-#     with open(base.rcFile, 'w') as fid:
-#         config.write(fid)
-#     return config
 
-def updateCars():
-    config = configparser.ConfigParser()
-    try:
-        config.read(base.rcFile)
-    except configparser.ParsingError as e:
-        base.logger.exception('Bad config file.')
-        raise ConfigError from e
-    # Retrieve a list of vehicles
-    url = 'https://owner-api.teslamotors.com/api/1/vehicles'
+def refreshCars():
+    config = getConfig()
+    url = 'https://{}/api/1/vehicles'.format(base.site)
     headers = {
         'Authorization': 'Bearer {}'.format(config['token']['access_token'])
     }
@@ -190,7 +187,7 @@ def updateCars():
             newConfig[key] = {'id': car['id'],
                               'vid': car['vehicle_id'],
                               'name': car['display_name']}
-        with open('testconfig', 'w') as fid:
+        with open(base.rcFile, 'w') as fid:
             newConfig.write(fid)
     else:
         base.logger.exception('Unable to retrieve list of vehicles.')
