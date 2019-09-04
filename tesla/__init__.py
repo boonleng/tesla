@@ -42,10 +42,11 @@ def requestData(index=0, retry=True):
     if res.status_code == 200:
         return res.json()['response']
     elif res.status_code == 404 and retry:
-        base.logger.exception('Vechicle not found. Try refreshing cars... r = {}'.format(res.status_code))
+        base.logger.info('Vechicle not found. Try refreshing cars... r = {}'.format(res.status_code))
         account.refreshCars()
         return requestData(index=index, retry=False)
-    base.logger.exception('Vechicle connection error. r = {}'.format(res.status_code))
+    if res.status_code != 408:
+        base.logger.warning('Vechicle connection error. r = {}'.format(res.status_code))
     return None
 
 def objFromFile(filename):
