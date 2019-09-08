@@ -42,10 +42,16 @@ def requestData(index=0, retry=True):
     if res.status_code == 200:
         return res.json()['response']
     elif res.status_code == 404 and retry:
+        # Not found
         base.logger.info('Vechicle not found. Try refreshing cars... r = {}'.format(res.status_code))
         account.refreshCars()
         return requestData(index=index, retry=False)
-    if res.status_code != 408:
+    if res.status_code == 504:
+        # Gateway timeout
+        base.logger.info('Gateway timeout. Retry in 10 seconds ...')
+        time.sleep(10)
+        return requestData(index=index, retry=True)
+    if res.status_code not in [408]:
         base.logger.warning('Vechicle connection error. r = {}'.format(res.status_code))
     return None
 
