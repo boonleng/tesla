@@ -9,7 +9,6 @@ logHome = os.path.expanduser('~/logs')
 dataLogHome = os.path.expanduser('~/Documents/Tesla')
 logger = logging.getLogger('Tesla')
 
-
 def setLogPrefix(prefix):
     logfile = '{}/{}-{}.log'.format(logHome, prefix, time.strftime('%Y%m%d', time.localtime(time.time())))
     fileHandler = logging.FileHandler(logfile, 'a')
@@ -34,8 +33,12 @@ def showMessageLevel(level):
         handler.setFormatter(logging.Formatter('%(asctime)s %(message)s', datefmt='%H:%M:%S'))
         logger.addHandler(handler)
     for h in logger.handlers:
-        h.setLevel(level)
-    logger.setLevel(level)
+        if not isinstance(h, logging.FileHandler):
+            h.setLevel(level)
+    if level < logging.INFO:
+        logger.setLevel(level)
+    else:
+        logger.setLevel(logging.INFO)
 
 
 def showWarningMessages():

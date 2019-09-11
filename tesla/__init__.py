@@ -7,6 +7,9 @@ __version__ = '0.9'
 
     Updates
 
+    0.9.1  - 9/11/2019
+           - Logger level is always at logging.INFO or less
+
     0.9    - 9/4/2019
            - Updated logging
            - Logs are now in local time
