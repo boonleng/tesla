@@ -54,8 +54,9 @@ if __name__ == '__main__':
         getStat.py -v
         '''
     parser = argparse.ArgumentParser(prog='getStat', usage=usage, formatter_class=argparse.RawTextHelpFormatter)
-    parser.add_argument('-w', '--write', default=False, action="store_true", help='writes the results to a file')
     parser.add_argument('-v', default=0, action='count', help='increase the verbosity level')
+    parser.add_argument('-u', default=False, action="store_true", help='updates the HTML calendar')
+    parser.add_argument('-w', default=False, action="store_true", help='writes the results to a file')
     args = parser.parse_args()
 
     # Set the logger to output something if verbosity flag is set
@@ -79,8 +80,8 @@ if __name__ == '__main__':
             dat['charge_state']['battery_level'],
             dat['charge_state']['battery_range'],
             dat['charge_state']['ideal_battery_range'],
-            args.write))
-        if args.write:
+            args.w))
+        if args.w:
             now = time.localtime(time.time())
             path = '{}/{}'.format(tesla.dataLogHome, time.strftime('%Y%m%d', now))
             if not os.path.exists(path):
@@ -89,6 +90,7 @@ if __name__ == '__main__':
             with open(filename, 'w') as fid:
                 fid.write(jsonString)
                 fid.close()
+        if args.u:
             code = tesla.getDataInHTML()
             with open(os.path.expanduser('~/Developer/tesla/calendar.html'), 'w') as fid:
                 fid.write(code)

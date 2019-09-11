@@ -25,6 +25,7 @@ __version__ = '0.9'
 """
 
 import os
+import sys
 import glob
 import json
 import time
@@ -32,10 +33,6 @@ import requests
 
 from .base import *
 from . import account
-
-# Do this to ensure custom fonts are available
-# import tesla.font
-# prop = tesla.font.Properties()
 
 config = account.getConfig()
 
@@ -134,6 +131,16 @@ def getCalendarArray(count=5):
 def getDataInHTML(count=4, padding=0.05, showFadeIcon=True):
 
     tt, dd = getCalendarArray(count)
+
+    # Do this to ensure custom fonts are available
+    import importlib
+    if sys.version_info < (3, 4):
+        found = importlib.find_loader('matplotlib') is not None
+    else:
+        found = importlib.util.find_spec('matplotlib') is not None
+    if found:
+        import tesla.font
+        prop = tesla.font.Properties()
 
     # Initial figsize to get things started
     figsize = (900, 135 * len(tt) + 90)
