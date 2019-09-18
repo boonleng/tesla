@@ -27,7 +27,7 @@ def objFromFile(filename):
         fobj.close()
     return json.loads(json_str)
 
-def getLatestDays(count=28):
+def getLatestDays(count=28, readAll=False):
     folders = glob.glob('{}/2*'.format(base.dataLogHome))
     folders.sort()
 
@@ -38,12 +38,20 @@ def getLatestDays(count=28):
         files.sort()
         dd = []
         for file in files:
-            #print('{}'.format(file))
             data = objFromFile(file)
             dd.append(data)
         d.append(dd)
-        o = d[-1][-1]['charge_state']
-        t.append(o['timestamp'] / 1000)
+        o = objFromFile(files[-1])
+        f = os.path.basename(files[-1])
+        s = time.mktime(time.strptime(f, '%Y%m%d-%H%M.json'))
+        #s = d[-1][-1]['charge_state']['timestamp'] / 1000
+        #t.append(s)
+        t.append(s)
+        # s2 = d[-1][-1]['charge_state']['timestamp'] / 1000
+        # t2 = time.localtime(s2)
+        # print('{} -> {} / {} {}'.format(f, 
+        #     time.strftime('%Y-%m-%d %H:%M', time.localtime(s)),
+        #     time.strftime('%Y-%m-%d %H:%M', t2), t2.tm_zone))
     return t, d
 
 def getCalendarArray(count=5):
@@ -72,11 +80,17 @@ def getCalendarArray(count=5):
     while k < 7 and k < len(t) and t[k] < t0:
         k += 1
 
+    # for i in range(len(t)):
+    #     print('t[{}] = {}'.format(i, time.strftime('%Y-%m-%d %H:%M', time.localtime(t[i]))))
+
     # Make a (count)-week array of data arrays
     for _ in range(count):
         tw = []
         dw = []
         for _ in range(7):
+            # print('t0 = {}  t[{}] = {}'.format(
+            #     time.strftime('%Y-%m-%d %H:%M', time.localtime(t0)), k,
+            #     time.strftime('%Y-%m-%d %H:%M', time.localtime(t[k]))))
             if k < len(t) and t0 <= t[k] and t[k] < (t0 + 86400):
                 tw.append(time.localtime(t[k]))
                 dw.append(d[k])
@@ -230,7 +244,7 @@ def getDataInHTML(count=4, padding=0.05, showFadeIcon=True):
                 code += '<div class="chargeLevel{}" style="height:{}%"></div>\n'.format(elementClass, chargeLevel)
 
                 # Calculate total miles driven
-                if o1 is None:
+                if o1 is None and dayArray[0] is not None:
                     o1 = dayArray[0]['vehicle_state']['odometer']
                 o0 = dayArray[-1]['vehicle_state']['odometer']
                 delta_o = o0 - o1

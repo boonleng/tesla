@@ -142,7 +142,7 @@ def refreshToken():
     
     return config
 
-def updateToken():
+def testUpdateToken():
     config = configparser.ConfigParser()
     try:
         config.read(base.rcFile)
