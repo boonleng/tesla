@@ -1,4 +1,31 @@
+__version__ = '0.9'
+
+"""
+    Tesla API Bridge
+
+    @author: Boonleng Cheong
+
+    Updates
+
+    0.9.1  - 9/11/2019
+           - Logger level is always at logging.INFO or less
+
+    0.9    - 9/4/2019
+           - Updated logging
+           - Logs are now in local time
+           - Added refreshToken()
+           - Added refreshCars()
+           - Improved handling of empty data logs
+
+    0.5    - 8/7/2019
+           - Decided to mave all modules into ./tesla
+
+    0.1    - 7/21/2019
+           - Started
+"""
+
 import os
+import sys
 import glob
 import json
 import time
@@ -9,7 +36,7 @@ from . import account
 
 config = account.getConfig()
 
-def requestData(index=0):
+def requestData(index=0, retry=True):
     vehicleId = config['cars'][index]['id']
     url = 'https://owner-api.teslamotors.com/api/1/vehicles/{}/vehicle_data'.format(vehicleId)
     headers = {
@@ -18,7 +45,18 @@ def requestData(index=0):
     res = requests.get(url, headers=headers)
     if res.status_code == 200:
         return res.json()['response']
-    base.logger.info('Vechicle connection error. r = {}'.format(res.status_code))
+    elif res.status_code == 404 and retry:
+        # Not found
+        base.logger.info('Vechicle not found. Try refreshing cars... r = {}'.format(res.status_code))
+        account.refreshCars()
+        return requestData(index=index, retry=False)
+    if res.status_code == 504:
+        # Gateway timeout
+        base.logger.info('Gateway timeout. Retry in 10 seconds ...')
+        time.sleep(10)
+        return requestData(index=index, retry=True)
+    if res.status_code not in [408]:
+        base.logger.warning('Vechicle connection error. r = {}'.format(res.status_code))
     return None
 
 def objFromFile(filename):
@@ -109,8 +147,14 @@ def getDataInHTML(count=4, padding=0.05, showFadeIcon=True):
     tt, dd = getCalendarArray(count)
 
     # Do this to ensure custom fonts are available
-    import tesla.font
-    prop = tesla.font.Properties()
+    import importlib
+    if sys.version_info < (3, 4):
+        found = importlib.find_loader('matplotlib') is not None
+    else:
+        found = importlib.util.find_spec('matplotlib') is not None
+    if found:
+        import tesla.font
+        prop = tesla.font.Properties()
 
     # Initial figsize to get things started
     figsize = (900, 135 * len(tt) + 90)
