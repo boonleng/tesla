@@ -13,7 +13,7 @@ def configParserToConfig(config):
     for sec in config.sections():
         if sec not in ['user', 'token']:
             cars.append(dict(config[sec]))
-    return {'username':config['user']['username'], 'token':dict(config['token']), 'cars':cars}
+    return {'username':config['user']['username'], 'timezone':config['user']['timezone'], 'token':dict(config['token']), 'cars':cars}
 
 
 def getConfig():
@@ -72,11 +72,14 @@ def getConfig():
         else:
             base.logger.exception('Unable to retrieve list of vehicles.')
 
+        # Get the timezone from vehicle's location? Hard-code for now...
+        timezone = 'US/Central'
+
         # Save username and token into the configuration
         config = configparser.ConfigParser()
         config.add_section('user')
         config.add_section('token')
-        config['user'] = {'username': username}
+        config['user'] = {'username': username, 'timezone': timezone}
         config['token'] = token
         if len(cars):
             for car in cars:
@@ -177,8 +180,8 @@ def refreshCars():
         newConfig = configparser.ConfigParser()
         newConfig.add_section('user')
         newConfig.add_section('token')
-        newConfig['user'] = dict(config['user'])
-        newConfig['token'] = dict(config['token'])
+        newConfig['user'] = {'username': config['username'], 'timezone': config['timezone']}
+        newConfig['token'] = config['token']
         for car in cars:
             key = car['vin']
             newConfig.add_section(key)
