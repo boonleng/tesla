@@ -16,8 +16,8 @@ def configParserToConfig(config):
     return {'username':config['user']['username'], 'token':dict(config['token']), 'cars':cars}
 
 
-def getConfig():
-    if not os.path.exists(base.rcFile):
+def getConfig(force=False):
+    if not os.path.exists(base.rcFile) or force:
         base.logger.info('No configuration file. Setting up ...')
         try:
             username = input('Enter username: ')
@@ -188,6 +188,7 @@ def refreshCars():
                               'name': car['display_name']}
         with open(base.rcFile, 'w') as fid:
             newConfig.write(fid)
+        return configParserToConfig(newConfig)
     else:
         base.logger.exception('Unable to retrieve list of vehicles.')
-    return configParserToConfig(newConfig)
+    return config
