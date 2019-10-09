@@ -2,14 +2,14 @@
 
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-	<link rel="stylesheet" type="text/css" href="common.css?v=4"/>
+	<link rel="stylesheet" type="text/css" href="common.css?v=10"/>
 	<style type="text/css">
-		.hidden {visibility:hidden;}
-		.boxContainer {width:898px; height:935px;}
-		.dayOfWeek {width:123px; height:50px;}
-		.box {width:123px; height:148px;}
+		.hidden {visibility:hidden}
+		.boxContainer {width:898px; height:935px}
+		.dayOfWeek {width:123px; height:50px}
+		.box {width:123px; height:148px}
 	</style>
-	<title>Car Summary</title>
+	<title>Tesala Vehicle Summary</title>
 </head>
 
 <body>
@@ -19,6 +19,7 @@
 <?php
 date_default_timezone_set('UTC');
 
+// Global variables
 $store = '/home/boonleng/Documents/Tesla';
 $folders = scandir($store, 0);
 $folders = array_slice($folders, count($folders) - 35);
@@ -29,6 +30,25 @@ $offset = 6;
 $showFadeIcon = True;
 
 // print_r($folders);
+
+function date_from_filename($file) {
+	return date_create_from_format('YmjHi', substr($file, 0, 8) . '0000');
+}
+
+function datetime_from_filename($file) {
+	return date_create_from_format('Ymj-Hi', substr($file, 0, 13));
+}
+
+function insertOrFadeIcon($cond, $image) {
+	$appendix = '';
+	if ($cond or $GLOBALS['showFadeIcon']) {
+		if (!$cond and $GLOBALS['showFadeIcon']) {
+			$appendix .= ' fade';
+		}
+		return '<img class="icon' . $appendix . '" src="' . $image . '"/>';
+	}
+	return '';
+}
 
 // Read in the data
 $data = array();
@@ -44,36 +64,19 @@ foreach ($folders as $folder) {
 	array_push($data, $frames);
 }
 
-function date_from_filename($file) {
-	return date_create_from_format('YmjHi', substr($file, 0, 8) . '0000');
-}
-
-function datetime_from_filename($file) {
-	return date_create_from_format('Ymj-Hi', substr($file, 0, 13));
-}
-
 $i = 0;
 $last = $data[count($data) - 1];
 $file = $last[count($last) - 1][0];
 $frame = $last[count($last) - 1][1];
 $fileDate = date_from_filename($file);
 $targetMonth = date_format($fileDate, 'm');
-// echo $file . "\n";
-// echo substr($file, 0, 13) . "\n";
-// echo date_format($fileDate, 'Y-m-d H:i') . "\n";
-
-// print_r($frame['vin']);
-
-$m = date_format($fileDate, 'F');
-$y = date_format($fileDate, 'Y');
 $vin = $frame['vin'] . ' - ' . $frame['vehicle_state']['car_version'];
-
 $lastUpdate = date_format(datetime_from_filename($file), 'Y-m-d g:i A');
 
 $html = array();
-
 array_push($html, '  <div class="title">');
-array_push($html, '    <div class="titleMonth">' . $m . '</div><div class="titleYear">' . $y . '</div>');
+array_push($html, '    <div class="titleMonth">' . date_format($fileDate, 'F') . '</div>');
+array_push($html, '    <div class="titleYear">' . date_format($fileDate, 'Y') . '</div>');
 array_push($html, '  </div>');
 array_push($html, '  <div class="vin medium"><b>' . $frame['vehicle_state']['vehicle_name'] . '</b> - ' . $vin . '</div>');
 array_push($html, '  <div class="update medium">Last Updated :' . $lastUpdate . '</div>');
@@ -118,20 +121,10 @@ $today = DateTime::createFromFormat('YmjHi', date('Ymd') . '0000');
 
 // echo date_format($today, 'Ymj-Hi') . "\n";
 
-function insertOrFadeIcon($cond, $image) {
-	$appendix = '';
-	if ($cond or $GLOBALS['showFadeIcon']) {
-		if (!$cond and $GLOBALS['showFadeIcon']) {
-			$appendix .= ' fade';
-		}
-		return '<img class="icon' . $appendix . '" src="' . $image . '"/>';
-	}
-	return '';
-}
-
 // Loop through data (i) but up to (count) weeks. The variable i increases on Saturday
 $j = 0;
 $d = 0;
+$m = 0;
 $o1 = 0;
 $s1 = 0;
 $chargeAlpha = 0;
@@ -174,11 +167,16 @@ for ($k = 0; $k < $count * 7; $k++) {
 
 			// If there was a charging event
 			$carCharged = False;
-			for ($n = 0; $n < count($day) and !$carCharged; $n++) {
+			$chargeLo = 100;
+			$chargeHi = 0;
+			for ($n = 0; $n < count($day); $n++) {
 				$frame = $day[$n][1];
-				if ($frame['charge_state']['charging_state'] == 'Charging') {
+				if (!$carCharged and $frame['charge_state']['charging_state'] == 'Charging') {
 					$carCharged = True;
 				}
+				$charge = $frame['charge_state']['battery_level'];
+				$chargeLo = min($chargeLo, $charge);
+				$chargeHi = max($chargeHi, $charge);
 			}
 
 			// Software version
@@ -195,7 +193,6 @@ for ($k = 0; $k < $count * 7; $k++) {
 				$chargeAlpha = $frameAlpha['charge_state']['battery_level'];
 			}
 			$chargeOmega = $frameOmega['charge_state']['battery_level'];
-			$chargeDelta = $chargeOmega - $chargeAlpha;
 			$elemClass = '';
 			$r = floor($chargeOmega * 0.1);
 			if ($r <= 5) {
@@ -203,9 +200,10 @@ for ($k = 0; $k < $count * 7; $k++) {
 			}
 			array_push($html, '    <div class="chargeLevel' . $elemClass . '" style="height:' . $chargeOmega . '%"></div>');
 			if ($carCharged) {
-				array_push($html, '    <div class="chargeAdded" style="bottom:' . $chargeAlpha . '%; height:' . $chargeDelta . '%"></div>');
+				array_push($html, '    <div class="chargeAdded" style="bottom:' . $chargeOmega . '%; height:' . ($chargeHi - $chargeOmega) . '%"></div>');
+				array_push($html, '    <div class="chargeAddedUsed" style="bottom:' .  $chargeLo . '%; height:' . ($chargeOmega - $chargeLo) . '%"></div>');
 			} else {
-				array_push($html, '    <div class="chargeUsed" style="bottom:' . $chargeOmega . '%; height:' . (-$chargeDelta) . '%"></div>');
+				array_push($html, '    <div class="chargeUsed" style="bottom:' . $chargeOmega . '%; height:' . ($chargeAlpha - $chargeOmega) . '%"></div>');
 			}
 			$chargeAlpha = $chargeOmega;
 
@@ -219,7 +217,7 @@ for ($k = 0; $k < $count * 7; $k++) {
 			// Lines of information
 			array_push($html, '    <div class="info">');
 			array_push($html, '      <span class="textInfo large">' . $chargeOmega . '%</span>');
-			array_push($html, '      <span class="textInfo medium">' . date_format($fileDate, 'g:i A') . '</span>');
+			array_push($html, '      <span class="textInfo medium">' . date_format($fileDate, 'g:i A') . ' ' . $chargeLo . '</span>');
 			array_push($html, '      <span class="textInfo medium">' . $activity . ' (' . count($day) . ')</span>');
 			array_push($html, '      <span class="textInfo medium">' . number_format($o0, 1, '.', ',') . ' mi</span>');
 			array_push($html, '    </div>');
