@@ -118,8 +118,8 @@ $dayStart = date_from_filename($file);
 
 function insertOrFadeIcon($cond, $image) {
 	$appendix = '';
-	if ($cond or $showFadeIcon) {
-		if (!$cond and $showFadeIcon) {
+	if ($cond or $GLOBALS['showFadeIcon']) {
+		if (!$cond and $GLOBALS['showFadeIcon']) {
 			$appendix .= ' fade';
 		}
 		return '<img class="icon' . $appendix . '" src="' . $image . '"/>';
@@ -177,8 +177,17 @@ for ($k = 0; $k < $count * 7; $k++) {
 			$carDriven = $miles > 1.0;
 			$o1 = $o0;
 
+			// If there was a charging event
+			$carCharged = False;
+			for ($n = 0; $n < count($day) and !$carCharged; $n++) {
+				$frame = $day[$n][1];
+				if ($frame['charge_state']['charging_state'] == 'Charging') {
+					$carCharged = True;
+				}
+			}
+
 			// Software version
-			$carUpdated = false;
+			$carUpdated = False;
 			if ($s1 == 0) {
 				$s1 = $frameAlpha['vehicle_state']['car_version'];
 			}
@@ -189,6 +198,8 @@ for ($k = 0; $k < $count * 7; $k++) {
 			// Icon bar using the information derived earlier
 			array_push($html, '    <div class="iconBar">');
 			array_push($html, '      ' . insertOrFadeIcon($carDriven, 'blob/wheel.png'));
+			array_push($html, '      ' . insertOrFadeIcon($carCharged, 'blob/charge.png'));
+			array_push($html, '      ' . insertOrFadeIcon($carUpdated, 'blob/up.png'));
 			array_push($html, '    </div>');
 
 			// Lines of information
