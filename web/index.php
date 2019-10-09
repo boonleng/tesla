@@ -2,7 +2,7 @@
 
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-	<link rel="stylesheet" type="text/css" href="common.css"/>
+	<link rel="stylesheet" type="text/css" href="common.css?v=4"/>
 	<style type="text/css">
 		.hidden {visibility:hidden;}
 		.boxContainer {width:898px; height:935px;}
@@ -68,7 +68,7 @@ $m = date_format($fileDate, 'F');
 $y = date_format($fileDate, 'Y');
 $vin = $frame['vin'] . ' - ' . $frame['vehicle_state']['car_version'];
 
-
+$lastUpdate = date_format(datetime_from_filename($file), 'Y-m-d g:i A');
 
 $html = array();
 
@@ -76,6 +76,7 @@ array_push($html, '  <div class="title">');
 array_push($html, '    <div class="titleMonth">' . $m . '</div><div class="titleYear">' . $y . '</div>');
 array_push($html, '  </div>');
 array_push($html, '  <div class="vin medium"><b>' . $frame['vehicle_state']['vehicle_name'] . '</b> - ' . $vin . '</div>');
+array_push($html, '  <div class="update medium">Last Updated :' . $lastUpdate . '</div>');
 
 $oneDay = new DateInterval('P1D');
 for ($k = 0; $k < 7; $k++) {
@@ -133,6 +134,7 @@ $j = 0;
 $d = 0;
 $o1 = 0;
 $s1 = 0;
+$chargeAlpha = 0;
 for ($k = 0; $k < $count * 7; $k++) {
 	$x = $d * ($width + $offset);
 	$y = $j * ($height + $offset) + 90;
@@ -159,15 +161,6 @@ for ($k = 0; $k < $count * 7; $k++) {
 			$frameAlpha = $day[0][1];
 			$frameOmega = $day[count($day) - 1][1];
 			$fileDate = datetime_from_filename($file);
-
-			// Battery level
-			$chargeLevel = $frameOmega['charge_state']['battery_level'];
-			$elemClass = '';
-			$r = floor($chargeLevel * 0.1);
-			if ($r <= 5) {
-				$elemClass .= ' charge' . $r;
-			}
-			array_push($html, '    <div class="chargeLevel' . $elemClass . '" style="height:' . $chargeLevel . '%"></div>');
 
 			// Calculate total miles driven
 			if ($o1 == 0 and count($day) > 1) {
@@ -196,6 +189,25 @@ for ($k = 0; $k < $count * 7; $k++) {
 			$carUpdated = $s0 != $s1;
 			$s1 = $s0;
 
+			// Battery level
+			if ($chargeAlpha == 0) {
+				$chargeAlpha = $frameAlpha['charge_state']['battery_level'];
+			}
+			$chargeOmega = $frameOmega['charge_state']['battery_level'];
+			$chargeDelta = $chargeOmega - $chargeAlpha;
+			$elemClass = '';
+			$r = floor($chargeOmega * 0.1);
+			if ($r <= 5) {
+				$elemClass .= ' charge' . $r;
+			}
+			array_push($html, '    <div class="chargeLevel' . $elemClass . '" style="height:' . $chargeOmega . '%"></div>');
+			if ($carCharged) {
+				array_push($html, '    <div class="chargeAdded" style="bottom:' . $chargeAlpha . '%; height:' . $chargeDelta . '%"></div>');
+			} else {
+				array_push($html, '    <div class="chargeUsed" style="bottom:' . $chargeOmega . '%; height:' . (-$chargeDelta) . '%"></div>');
+			}
+			$chargeAlpha = $chargeOmega;
+
 			// Icon bar using the information derived earlier
 			array_push($html, '    <div class="iconBar">');
 			array_push($html, '      ' . insertOrFadeIcon($carDriven, 'blob/wheel.png'));
@@ -205,7 +217,7 @@ for ($k = 0; $k < $count * 7; $k++) {
 
 			// Lines of information
 			array_push($html, '    <div class="info">');
-			array_push($html, '      <span class="textInfo large">' . $chargeLevel . '%</span>');
+			array_push($html, '      <span class="textInfo large">' . $chargeOmega . '%</span>');
 			array_push($html, '      <span class="textInfo medium">' . date_format($fileDate, 'g:i A') . '</span>');
 			array_push($html, '      <span class="textInfo medium">+' . number_format($miles, 1, '.', ',') . ' mi (' . count($day) . ')</span>');
 			array_push($html, '      <span class="textInfo medium">' . number_format($o0, 1, '.', ',') . ' mi</span>');

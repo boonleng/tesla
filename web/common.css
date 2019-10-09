@@ -16,8 +16,10 @@ html {font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 10pt}
 .dayLabel, .titleDayLabel {display:block; position:absolute; top:5px; right:5px; font-size:1.1em; z-index:100}
 .today {color:#39f; font-weight:500}
 .titleDayLabel {font-size:1.2em}
-.otherMonth {color:#aaa;}
-.chargeLevel {display:block; position:absolute; bottom:0; width:100%; background-color:#88ff00; z-index:0}
+.otherMonth {color:#aaa}
+.chargeLevel {display:block; position:absolute; bottom:0; width:100%; background-color:#88ff00; z-index:1}
+.chargeAdded {display:block; position:absolute; width:100%; background-color:rgba(255, 255, 150, 0.35); z-index:2}
+.chargeUsed {display:block; position:absolute; width:100%; background-color:rgba(0, 0, 0, 0.08); z-index:1}
 .charge5 {background-color:#88ff00}
 .charge4 {background-color:#c3ee00}
 .charge3 {background-color:#ffdd00}
@@ -25,13 +27,13 @@ html {font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 10pt}
 .charge1 {background-color:#ff6666}
 .charge0 {background-color:#ff4499}
 
-.info {display:block; position:absolute; bottom:8%; width:95.0%; margin:0 2.5%; padding:0; text-align:center}
+.info {display:block; position:absolute; bottom:8%; width:95.0%; margin:0 2.5%; padding:0; text-align:center; z-index:100}
 .textInfo {display:block; width:100%; margin-bottom:0.3em; line-height:1.0em}
 .large {font-size:1.8em; font-weight:500; font-stretch:extra-expanded}
 .medium {font-size:1.0em}
 .small {font-size:0.9em}
 .tiny {font-size:0.8em}
 
-.iconBar {display:block; position:absolute; top:5px; left:8px; width:100%}
+.iconBar {display:block; position:absolute; top:5px; left:8px; width:100%; z-index:100}
 img.icon, img.blankIcon {display:block; float:left; margin:0; width:16px; height:16px; padding:2px 3px}
 .fade {opacity:0.15;}
