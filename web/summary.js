@@ -40,8 +40,8 @@ CarSummary.prototype.refresh = function() {
 			html.push('<div class="boxContainer">');
 			html.push('  <div class="title">');
 			html.push('  <div class="titleMonth">' + m + '</div><div class="titleYear">' + y + '</div>');
-			html.push('</div>');
-			html.push('<div class="vin medium"><b>' + frame['vehicle_state']['vehicle_name'] + '</b> - ' + self.vin + '</div>');
+			html.push('  </div>');
+			html.push('  <div class="vin medium"><b>' + frame['vehicle_state']['vehicle_name'] + '</b> - ' + self.vin + '</div>');
 
 			for (i = 0; i < 7; i++) {
 				if (dayStart.getUTCDay() == 0) {
@@ -82,6 +82,17 @@ CarSummary.prototype.refresh = function() {
 			file = self.data[i][0][0];
 			var dayStart = dateFromFilename(file);
 
+			insertOrFadeIcon = function(cond, image) {
+				appendix = '';
+				if (cond || self.showFadeIcon) {
+					if (!cond && self.showFadeIcon) {
+						appendix += ' fade';
+					}
+					return '<img class="icon' + appendix + '" src="' + image + '"/>\n';
+				}
+				return '';
+			};
+
 			// Loop through data (i) but up to (count) weeks. The variable i increases on Saturday
 			var j = 0;
 			var d = 0;
@@ -107,17 +118,6 @@ CarSummary.prototype.refresh = function() {
 				}
 				html.push('  <div class="box" style="left:' + x + 'px; top:' + y + 'px">');
 				html.push('    <div class="dayLabel' + elemClass + '">' + dayString + '</div>');
-
-				insertOrFadeIcon = function(cond, image) {
-					appendix = '';
-					if (cond || self.showFadeIcon) {
-						if (!cond && self.showFadeIcon) {
-							appendix += ' fade';
-						}
-						return '<img class="icon' + appendix + '" src="' + image + '"/>\n';
-					}
-					return '';
-				};
 
 				if (i < self.data.length) {
 					day = self.data[i];
