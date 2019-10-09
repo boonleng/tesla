@@ -35,7 +35,7 @@ CarSummary.prototype.refresh = function() {
 			var targetMonth = dayStart.getUTCMonth();
 			var m = dayStart.toLocaleString('default', { timeZone: 'UTC' , month: 'long' });
 			var y = dayStart.toLocaleString('default', { timeZone: 'UTC' , year: 'numeric' });
-			var frame = JSON.parse(last[last.length - 1][1]);
+			var frame = last[last.length - 1][1];
 			self.vin = frame['vin'] + ' - ' + frame['vehicle_state']['car_version'];
 			html.push('<div class="boxContainer">');
 			html.push('  <div class="title">');
@@ -55,7 +55,7 @@ CarSummary.prototype.refresh = function() {
 			console.log(dayStart.toUTCString());
 
 			// Make a top row showing days
-			var t0 = dayStart.getTime();
+			var t0 = dayStart;
 			for (var n = 0; n < 7; n++) {
 				var y = 60;
 				var x = n * (self.width + self.offset);
@@ -124,8 +124,8 @@ CarSummary.prototype.refresh = function() {
 					file = day[day.length - 1][0];
 					fileDate = dateTimeFromFilename(file);
 					if (fileDate.getUTCDate() == dayStart.getUTCDate()) {
-						var frameAlpha = JSON.parse(day[0][1]);
-						var frameOmega = JSON.parse(day[day.length - 1][1]);
+						var frameAlpha = day[0][1];
+						var frameOmega = day[day.length - 1][1];
 						// Battery level
 						chargeLevel = frameOmega['charge_state']['battery_level'];
 						elementClass = '';
@@ -147,7 +147,8 @@ CarSummary.prototype.refresh = function() {
 						// If there was a charging event
 						var carCharged = false;
 						for (var k = 0; k < day.length && carCharged == false; k++) {
-							if (day[k][1].includes('Charging')) {
+							var frame = day[k][1];
+							if (frame['charge_state']['charging_state'] == 'Charging') {
 								carCharged = true;
 							}
 						}

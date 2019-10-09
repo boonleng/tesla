@@ -1,9 +1,6 @@
 <?php
 date_default_timezone_set('UTC');
 
-// $strJsonFileContents = file_get_contents('/home/boonleng/Documents/Tesla/20191008/20191008-1000.json');
-// var_dump($strJsonFileContents); 
-
 $store = '/home/boonleng/Documents/Tesla';
 $folders = scandir($store, 0);
 $folders = array_slice($folders, count($folders) - 35);
@@ -18,7 +15,8 @@ foreach ($folders as $folder) {
 	foreach ($files as $file) {
 		$fullpath = $store . '/' . $folder . '/' . $file;
 		$contents = file_get_contents($fullpath);
-		array_push($frames, array($file, $contents));
+		$object = json_decode($contents);
+		array_push($frames, array($file, $object));
 	}
 	array_push($data, $frames);
 }
