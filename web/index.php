@@ -14,7 +14,6 @@
 
 <body>
 
-<div id="CarSummary">
 <div class="boxContainer">
 
 <?php
@@ -57,17 +56,19 @@ $i = 0;
 $last = $data[count($data) - 1];
 $file = $last[count($last) - 1][0];
 $frame = $last[count($last) - 1][1];
-$dayStart = date_from_filename($file);
-$targetMonth = date_format($dayStart, 'm');
+$fileDate = date_from_filename($file);
+$targetMonth = date_format($fileDate, 'm');
 // echo $file . "\n";
 // echo substr($file, 0, 13) . "\n";
-// echo date_format($dayStart, 'Y-m-d H:i') . "\n";
+// echo date_format($fileDate, 'Y-m-d H:i') . "\n";
 
 // print_r($frame['vin']);
 
-$m = date_format($dayStart, 'F');
-$y = date_format($dayStart, 'Y');
+$m = date_format($fileDate, 'F');
+$y = date_format($fileDate, 'Y');
 $vin = $frame['vin'] . ' - ' . $frame['vehicle_state']['car_version'];
+
+
 
 $html = array();
 
@@ -78,18 +79,18 @@ array_push($html, '  <div class="vin medium"><b>' . $frame['vehicle_state']['veh
 
 $oneDay = new DateInterval('P1D');
 for ($k = 0; $k < 7; $k++) {
-	// echo date_format($dayStart, 'Y-m-d H:i w') . "\n";
-	if (date_format($dayStart, 'w') == 0) {
+	// echo date_format($fileDate, 'Y-m-d H:i w') . "\n";
+	if (date_format($fileDate, 'w') == 0) {
 		break;
 	}
-	$dayStart->sub($oneDay);
+	$fileDate->sub($oneDay);
 }
 // Roll back another (count) weeks as the first Sunday
-$dayStart->sub(DateInterval::createFromDateString(($count - 1) * 7 . 'days'));
-//echo 'First Sunday -> ' . date_format($dayStart, 'Y-m-d H:i w') . "\n";
+$fileDate->sub(DateInterval::createFromDateString(($count - 1) * 7 . 'days'));
+//echo 'First Sunday -> ' . date_format($fileDate, 'Y-m-d H:i w') . "\n";
 
 // Make a top row showing days
-$t0 = $dayStart;
+$t0 = $fileDate;
 for ($k = 0; $k < 7; $k++) {
 	$y = 60;
 	$x = $k * ($width + $offset);
@@ -99,8 +100,8 @@ for ($k = 0; $k < 7; $k++) {
 	array_push($html, '    <div class="titleDayLabel">' . $d . '</div>');
 	array_push($html, '  </div>');
 }
-// Look for the first Sunday to start showing
-$t0 = $dayStart;
+// Look for the first Sunday to start showing. This is the first day of the calendar
+$t0 = $fileDate;
 for ($i = 0; $i < count($data); $i++) {
 	$file = $data[$i][0][0];
 	//echo $file . "\n";
@@ -109,10 +110,10 @@ for ($i = 0; $i < count($data); $i++) {
 		break;
 	}
 }
+$calendarDay = date_from_filename($file);
 // echo '$i = ' . $i . "\n";
 
 $today = DateTime::createFromFormat('YmjHi', date('Ymd') . '0000');
-$dayStart = date_from_filename($file);
 
 // echo date_format($today, 'Ymj-Hi') . "\n";
 
@@ -136,16 +137,16 @@ for ($k = 0; $k < $count * 7; $k++) {
 	$x = $d * ($width + $offset);
 	$y = $j * ($height + $offset) + 90;
 	$elemClass = '';
-	if ($targetMonth != date_format($dayStart, 'm')) {
+	if ($targetMonth != date_format($calendarDay, 'm')) {
 		$elemClass .= ' otherMonth';
-	} else if ($dayStart == $today) {
+	} else if ($calendarDay == $today) {
 		$elemClass .= ' today';
 	}
-	if ($m != date_format($dayStart, 'm')) {
-		$m = date_format($dayStart, 'm');
-		$dayString = date_format($dayStart, 'M j');
+	if ($m != date_format($calendarDay, 'm')) {
+		$m = date_format($calendarDay, 'm');
+		$dayString = date_format($calendarDay, 'M j');
 	} else {
-		$dayString = date_format($dayStart, 'j');
+		$dayString = date_format($calendarDay, 'j');
 	}
 	array_push($html, '  <div class="box" style="left:' . $x . 'px; top:' . $y . 'px">');
 	array_push($html, '    <div class="dayLabel' . $elemClass . '">' . $dayString . '</div>');
@@ -153,7 +154,7 @@ for ($k = 0; $k < $count * 7; $k++) {
 		$day = $data[$i];
 		$file = $day[count($day) - 1][0];
 		$fileDate = date_from_filename($file);
-		if ($fileDate == $dayStart) {
+		if ($fileDate == $calendarDay) {
 			// Start and end frames of the day
 			$frameAlpha = $day[0][1];
 			$frameOmega = $day[count($day) - 1][1];
@@ -215,7 +216,7 @@ for ($k = 0; $k < $count * 7; $k++) {
 	}
 	array_push($html, '  </div>');
 
-	$dayStart->add($oneDay);
+	$calendarDay->add($oneDay);
 	if ($d++ == 6) {
 		$d = 0;
 		$j++;
@@ -226,8 +227,6 @@ echo join("\n", $html);
 
 ?>
 
-
-</div>
 </div>
 
 </body>
