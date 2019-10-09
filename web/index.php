@@ -169,6 +169,7 @@ for ($k = 0; $k < $count * 7; $k++) {
 			$o0 = $frameOmega['vehicle_state']['odometer'];
 			$miles = $o0 - $o1;
 			$carDriven = $miles > 1.0;
+			$activity = $miles >= 0.1 ? '+' . number_format($miles, 1, '.', ',') . ' mi' : 'parked';
 			$o1 = $o0;
 
 			// If there was a charging event
@@ -219,7 +220,7 @@ for ($k = 0; $k < $count * 7; $k++) {
 			array_push($html, '    <div class="info">');
 			array_push($html, '      <span class="textInfo large">' . $chargeOmega . '%</span>');
 			array_push($html, '      <span class="textInfo medium">' . date_format($fileDate, 'g:i A') . '</span>');
-			array_push($html, '      <span class="textInfo medium">+' . number_format($miles, 1, '.', ',') . ' mi (' . count($day) . ')</span>');
+			array_push($html, '      <span class="textInfo medium">' . $activity . ' (' . count($day) . ')</span>');
 			array_push($html, '      <span class="textInfo medium">' . number_format($o0, 1, '.', ',') . ' mi</span>');
 			array_push($html, '    </div>');
 
