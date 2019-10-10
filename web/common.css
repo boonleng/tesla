@@ -17,10 +17,11 @@ html {font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 10pt}
 .today {color:#39f; font-weight:500}
 .titleDayLabel {font-size:1.2em}
 .otherMonth {color:#aaa}
-.chargeLevel {display:block; position:absolute; bottom:0; width:100%; background-color:#88ff00; z-index:2}
-.chargeUsed {display:block; position:absolute; width:100%; background-color:rgba(0, 0, 0, 0.14); z-index:1}
-.chargeAdded {display:block; position:absolute; width:100%; background-color:#a6e8ff; z-index:3}
-.chargeAddedUsed {display:block; position:absolute; width:100%; background-color:rgba(50, 50, 200, 0.1); z-index:3}
+.charge {display:block; position:absolute; width:100%}
+.used {background-color:#ddd; z-index:1}
+.added {background-color:#7ff; z-index:3}
+.addedUsed {background-color:#4f2; z-index:3}
+.endOfDay {bottom:0; background-color:#8f0; z-index:2}
 .charge5 {background-color:#88ff00}
 .charge4 {background-color:#c3ee00}
 .charge3 {background-color:#ffdd00}

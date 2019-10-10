@@ -2,7 +2,7 @@
 
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-	<link rel="stylesheet" type="text/css" href="common.css?v=10"/>
+	<link rel="stylesheet" type="text/css" href="common.css?v=11"/>
 	<style type="text/css">
 		.hidden {visibility:hidden}
 		.boxContainer {width:898px; height:935px}
@@ -198,12 +198,12 @@ for ($k = 0; $k < $count * 7; $k++) {
 			if ($r <= 5) {
 				$elemClass .= ' charge' . $r;
 			}
-			array_push($html, '    <div class="chargeLevel' . $elemClass . '" style="height:' . $chargeOmega . '%"></div>');
+			array_push($html, '    <div class="charge endOfDay' . $elemClass . '" style="height:' . $chargeOmega . '%"></div>');
 			if ($carCharged) {
-				array_push($html, '    <div class="chargeAdded" style="bottom:' . $chargeOmega . '%; height:' . ($chargeHi - $chargeOmega) . '%"></div>');
-				array_push($html, '    <div class="chargeAddedUsed" style="bottom:' .  $chargeLo . '%; height:' . ($chargeOmega - $chargeLo) . '%"></div>');
+				array_push($html, '    <div class="charge added" style="bottom:' . $chargeOmega . '%; height:' . ($chargeHi - $chargeOmega) . '%"></div>');
+				array_push($html, '    <div class="charge addedUsed" style="bottom:' .  $chargeLo . '%; height:' . ($chargeOmega - $chargeLo) . '%"></div>');
 			} else {
-				array_push($html, '    <div class="chargeUsed" style="bottom:' . $chargeOmega . '%; height:' . ($chargeAlpha - $chargeOmega) . '%"></div>');
+				array_push($html, '    <div class="charge used" style="bottom:' . $chargeOmega . '%; height:' . ($chargeAlpha - $chargeOmega) . '%"></div>');
 			}
 			$chargeAlpha = $chargeOmega;
 
