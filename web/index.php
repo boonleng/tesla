@@ -134,11 +134,11 @@ for ($k = 0; $k < 7; $k++) {
 	}
 	$fileDate->sub($oneDay);
 }
-$fileDate->sub(DateInterval::createFromDateString(($count - 1) . 'weeks'));
-array_push($info, 'First Sunday -> ' . date_format($fileDate, 'Y-m-d H:i w'));
+$calendarDay = $fileDate->sub(DateInterval::createFromDateString(($count - 1) . 'weeks'));
+array_push($info, 'calendarDay -> ' . date_format($calendarDay, 'Y-m-d H:i D'));
 
 // Make a top row showing days
-$t0 = $fileDate;
+$t0 = clone $calendarDay;
 for ($k = 0; $k < 7; $k++) {
 	$y = 60;
 	$x = $k * ($width + $offset);
@@ -148,22 +148,29 @@ for ($k = 0; $k < 7; $k++) {
 	array_push($html, '    <div class="titleDayLabel">' . $d . '</div>');
 	array_push($html, '  </div>');
 }
-// Look for the first Sunday to start showing. This is the first day of the calendar
-$t0 = $fileDate;
-for ($i = 0; $i < count($data); $i++) {
-	$file = $data[$i][0][0];
-	$date = date_from_filename($file);
-	array_push($info, 'Checkpoint 2.' . $i . ' file = ' . $file . ' -> ' . date_format($date, 'Y-m-d H:i w'));
-	if (date_format($date, 'w') == 0) {
-		break;
+array_push($info, 'calendarDay -> ' . date_format($calendarDay, 'Y-m-d H:i D'));
+
+// Look for the first data index at the beginning of the calendar
+$i = 0;
+$file = $data[$i][0][0];
+$fileDate = date_from_filename($file);
+if ($fileDate < $calendarDay) {
+	$t0 = clone $calendarDay;
+	for ($i = 0; $i < count($data); $i++) {
+		$file = $data[$i][0][0];
+		$date = date_from_filename($file);
+		array_push($info, 'Checkpoint 2.' . $i . ' file = ' . $file . ' -> ' . date_format($date, 'Y-m-d H:i w'));
+		if (date_format($date, 'w') == 0) {
+			break;
+		}
 	}
 }
-$calendarDay = date_from_filename($file);
-$today = DateTime::createFromFormat('YmjHi', date('Ymd') . '0000');
-array_push($info, 'i = ' . $i);
-array_push($info, 'today = ' . date_format($today, 'Ymj-Hi'));
 
-// Loop through data (i) but up to (count) weeks. The variable i increases on Saturday
+$today = DateTime::createFromFormat('YmjHi', date('Ymd') . '0000');
+array_push($info, 'today = ' . date_format($today, 'Ymj-Hi'));
+array_push($info, 'i = ' . $i);
+
+// Loop through data (i) but up to (count) weeks. The variable j increases on Saturday
 $j = 0;
 $d = 0;
 $m = 0;
