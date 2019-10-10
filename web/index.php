@@ -2,7 +2,7 @@
 
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-	<link rel="stylesheet" type="text/css" href="common.css?v=11"/>
+	<link rel="stylesheet" type="text/css" href="common.css?v=12"/>
 	<style type="text/css">
 		.hidden {visibility:hidden}
 		.boxContainer {width:898px; height:935px}
@@ -21,8 +21,7 @@ date_default_timezone_set('UTC');
 
 // Global variables
 $store = '/home/boonleng/Documents/Tesla';
-$folders = scandir($store, 0);
-$folders = array_slice($folders, count($folders) - 35);
+$debug = False;
 $count = 5;
 $width = 123;
 $height = 148;
@@ -30,6 +29,17 @@ $offset = 6;
 $showFadeIcon = True;
 
 // print_r($folders);
+
+function list_folders($end_date = '20760520', $count = 35) {
+	$folders = scandir($GLOBALS['store'], 0);
+	$index = array_search($end_date, $folders);
+	if ($index) {
+		$folders = array_slice($folders, max(0, $index - $count + 1), $count);
+	} else {
+		$folders = array_slice($folders, max(0, count($folders) - $count));
+	}
+	return $folders;
+}
 
 function date_from_filename($file) {
 	return date_create_from_format('YmjHi', substr($file, 0, 8) . '0000');
@@ -39,7 +49,7 @@ function datetime_from_filename($file) {
 	return date_create_from_format('Ymj-Hi', substr($file, 0, 13));
 }
 
-function insertOrFadeIcon($cond, $image) {
+function insert_or_fade_icon($cond, $image) {
 	$appendix = '';
 	if ($cond or $GLOBALS['showFadeIcon']) {
 		if (!$cond and $GLOBALS['showFadeIcon']) {
@@ -50,7 +60,20 @@ function insertOrFadeIcon($cond, $image) {
 	return '';
 }
 
-// Read in the data
+// ------------------------------------------------------------------
+
+if ($_GET['debug']) {
+	$debug = True;
+}
+
+if ($_GET['end']) {
+	$endDate = $_GET['end'];
+} else {
+	$endDate = date('Ymd');
+}
+
+$folders = list_folders($endDate, 7 * $count);
+
 $data = array();
 foreach ($folders as $folder) {
 	$files = array_diff(scandir($store . '/' . $folder), array('..', '.'));
@@ -118,7 +141,6 @@ $calendarDay = date_from_filename($file);
 // echo '$i = ' . $i . "\n";
 
 $today = DateTime::createFromFormat('YmjHi', date('Ymd') . '0000');
-
 // echo date_format($today, 'Ymj-Hi') . "\n";
 
 // Loop through data (i) but up to (count) weeks. The variable i increases on Saturday
@@ -209,9 +231,9 @@ for ($k = 0; $k < $count * 7; $k++) {
 
 			// Icon bar using the information derived earlier
 			array_push($html, '    <div class="iconBar">');
-			array_push($html, '      ' . insertOrFadeIcon($carDriven, 'blob/wheel.png'));
-			array_push($html, '      ' . insertOrFadeIcon($carCharged, 'blob/charge.png'));
-			array_push($html, '      ' . insertOrFadeIcon($carUpdated, 'blob/up.png'));
+			array_push($html, '      ' . insert_or_fade_icon($carDriven, 'blob/wheel.png'));
+			array_push($html, '      ' . insert_or_fade_icon($carCharged, 'blob/charge.png'));
+			array_push($html, '      ' . insert_or_fade_icon($carUpdated, 'blob/up.png'));
 			array_push($html, '    </div>');
 
 			// Lines of information
@@ -232,6 +254,10 @@ for ($k = 0; $k < $count * 7; $k++) {
 		$d = 0;
 		$j++;
 	}
+}
+
+if ($debug) {
+	array_push($html, '<div id="debug">' . $endDate . '--><br/>' . implode(" ", $folders) . '</div>');
 }
 
 echo join("\n", $html);

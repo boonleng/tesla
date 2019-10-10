@@ -39,3 +39,5 @@ html {font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 10pt}
 .iconBar {display:block; position:absolute; top:5px; left:8px; width:100%; z-index:100}
 img.icon, img.blankIcon {display:block; float:left; margin:0; width:16px; height:16px; padding:2px 3px}
 .fade {opacity:0.15;}
+
+#debug {display:block; position:absolute; background-color: #fcc; bottom:0;}
