@@ -28,20 +28,30 @@ $height = 148;
 $offset = 6;
 $showFadeIcon = True;
 
+$info = array('<div id="debug">');
+$html = array('<div class="boxContainer">');
+
 // print_r($folders);
 
 function list_folders($end_date = '20760520', $count = 35) {
 	$folders = scandir($GLOBALS['store'], 0);
 	$index = array_search($end_date, $folders);
+	// echo "$end_date = $end_date   index = $index\n";
+	array_push($GLOBALS['info'], "index = $index");
+	// print_r($folders);
 	if ($index) {
-		$index -= $count + 1;
+		$index -= $count - 1;
 		if ($index < 2) {
-			$count += ($index);
+			$count -= 2 - $index;
 			$index = 2;
+			array_push($GLOBALS['info'], "index = $index   count = $count");
 		}
+		array_push($GLOBALS['info'], "index = $index   count = $count / " . count($folders));
+		array_push($GLOBALS['info'], "folder[$index] = " . $folders[$index]);
+		array_push($GLOBALS['info'], "folder[" . ($index + $count - 1) . "] = " . $folders[$index + $count - 1]);
 		$folders = array_slice($folders, $index, $count);
 	} else {
-		$folders = array_slice($folders, max(0, count($folders) - $count));
+		$folders = array_slice($folders, max(2, count($folders) - $count));
 	}
 	return $folders;
 }
@@ -67,9 +77,6 @@ function insert_or_fade_icon($cond, $image) {
 
 // ---
 
-$info = array('<div id="debug">');
-$html = array('<div class="boxContainer">');
-
 // Get variables from the URL
 
 if ($_GET['debug']) {
@@ -80,8 +87,8 @@ if ($_GET['end']) {
 } else {
 	$endDate = date('Ymd');
 }
-
-// $endDate = '20190731';
+// $endDate = '20190824';
+array_push($info, 'endDate = ' . $endDate);
 
 // List the folders and gather the data
 $folders = list_folders($endDate, 7 * $count);
@@ -97,8 +104,8 @@ foreach ($folders as $folder) {
 	}
 	array_push($data, $frames);
 }
-array_push($info, 'endDate = ' . $endDate);
 array_push($info, implode(' ', $folders));
+// return;
 
 // Common variables
 $i = 0;
