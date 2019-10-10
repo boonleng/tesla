@@ -40,4 +40,4 @@ html {font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 10pt}
 img.icon, img.blankIcon {display:block; float:left; margin:0; width:16px; height:16px; padding:2px 3px}
 .fade {opacity:0.15;}
 
-#debug {display:block; position:absolute; background-color: #fcc; bottom:0;}
+#debug {display:block; position:relative; background-color: #fcc; bottom:0;}

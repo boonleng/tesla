@@ -2,7 +2,7 @@
 
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-	<link rel="stylesheet" type="text/css" href="common.css?v=12"/>
+	<link rel="stylesheet" type="text/css" href="common.css?v=13"/>
 	<style type="text/css">
 		.hidden {visibility:hidden}
 		.boxContainer {width:898px; height:935px}
@@ -14,7 +14,7 @@
 
 <body>
 
-<div class="boxContainer">
+<!-- <div class="boxContainer"> -->
 
 <?php
 date_default_timezone_set('UTC');
@@ -34,7 +34,12 @@ function list_folders($end_date = '20760520', $count = 35) {
 	$folders = scandir($GLOBALS['store'], 0);
 	$index = array_search($end_date, $folders);
 	if ($index) {
-		$folders = array_slice($folders, max(0, $index - $count + 1), $count);
+		$index -= $count + 1;
+		if ($index < 2) {
+			$count += ($index);
+			$index = 2;
+		}
+		$folders = array_slice($folders, $index, $count);
 	} else {
 		$folders = array_slice($folders, max(0, count($folders) - $count));
 	}
@@ -60,20 +65,26 @@ function insert_or_fade_icon($cond, $image) {
 	return '';
 }
 
-// ------------------------------------------------------------------
+// ---
+
+$info = array('<div id="debug">');
+$html = array('<div class="boxContainer">');
+
+// Get variables from the URL
 
 if ($_GET['debug']) {
 	$debug = True;
 }
-
 if ($_GET['end']) {
 	$endDate = $_GET['end'];
 } else {
 	$endDate = date('Ymd');
 }
 
-$folders = list_folders($endDate, 7 * $count);
+// $endDate = '20190731';
 
+// List the folders and gather the data
+$folders = list_folders($endDate, 7 * $count);
 $data = array();
 foreach ($folders as $folder) {
 	$files = array_diff(scandir($store . '/' . $folder), array('..', '.'));
@@ -86,7 +97,10 @@ foreach ($folders as $folder) {
 	}
 	array_push($data, $frames);
 }
+array_push($info, 'endDate = ' . $endDate);
+array_push($info, implode(' ', $folders));
 
+// Common variables
 $i = 0;
 $last = $data[count($data) - 1];
 $file = $last[count($last) - 1][0];
@@ -96,7 +110,7 @@ $targetMonth = date_format($fileDate, 'm');
 $vin = $frame['vin'] . ' - ' . $frame['vehicle_state']['car_version'];
 $lastUpdate = date_format(datetime_from_filename($file), 'Y-m-d g:i A');
 
-$html = array();
+// Calendar HTML
 array_push($html, '  <div class="title">');
 array_push($html, '    <div class="titleMonth">' . date_format($fileDate, 'F') . '</div>');
 array_push($html, '    <div class="titleYear">' . date_format($fileDate, 'Y') . '</div>');
@@ -104,17 +118,17 @@ array_push($html, '  </div>');
 array_push($html, '  <div class="vin medium"><b>' . $frame['vehicle_state']['vehicle_name'] . '</b> - ' . $vin . '</div>');
 array_push($html, '  <div class="update medium">Last Updated :' . $lastUpdate . '</div>');
 
+// Find the Sunday of the week of interest, then roll back another (count) weeks as the first Sunday of the Calendar
 $oneDay = new DateInterval('P1D');
 for ($k = 0; $k < 7; $k++) {
-	// echo date_format($fileDate, 'Y-m-d H:i w') . "\n";
+	array_push($info, 'Checkpoint 1.' . $k . ' - ' . date_format($fileDate, 'Y-m-d H:i w'));
 	if (date_format($fileDate, 'w') == 0) {
 		break;
 	}
 	$fileDate->sub($oneDay);
 }
-// Roll back another (count) weeks as the first Sunday
-$fileDate->sub(DateInterval::createFromDateString(($count - 1) * 7 . 'days'));
-//echo 'First Sunday -> ' . date_format($fileDate, 'Y-m-d H:i w') . "\n";
+$fileDate->sub(DateInterval::createFromDateString(($count - 1) . 'weeks'));
+array_push($info, 'First Sunday -> ' . date_format($fileDate, 'Y-m-d H:i w'));
 
 // Make a top row showing days
 $t0 = $fileDate;
@@ -131,17 +145,16 @@ for ($k = 0; $k < 7; $k++) {
 $t0 = $fileDate;
 for ($i = 0; $i < count($data); $i++) {
 	$file = $data[$i][0][0];
-	//echo $file . "\n";
 	$date = date_from_filename($file);
+	array_push($info, 'Checkpoint 2.' . $i . ' file = ' . $file . ' -> ' . date_format($date, 'Y-m-d H:i w'));
 	if (date_format($date, 'w') == 0) {
 		break;
 	}
 }
 $calendarDay = date_from_filename($file);
-// echo '$i = ' . $i . "\n";
-
 $today = DateTime::createFromFormat('YmjHi', date('Ymd') . '0000');
-// echo date_format($today, 'Ymj-Hi') . "\n";
+array_push($info, 'i = ' . $i);
+array_push($info, 'today = ' . date_format($today, 'Ymj-Hi'));
 
 // Loop through data (i) but up to (count) weeks. The variable i increases on Saturday
 $j = 0;
@@ -256,11 +269,14 @@ for ($k = 0; $k < $count * 7; $k++) {
 	}
 }
 
-if ($debug) {
-	array_push($html, '<div id="debug">' . $endDate . '--><br/>' . implode(" ", $folders) . '</div>');
-}
+array_push($html, '</div>');
+array_push($info, '</div>');
 
 echo join("\n", $html);
+
+if ($debug) {
+	echo join("<br/>\n", $info);
+}
 
 ?>
 
