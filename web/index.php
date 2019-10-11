@@ -9,7 +9,7 @@
 		.dayOfWeek {width:123px; height:50px}
 		.box {width:123px; height:148px}
 	</style>
-	<title>Tesala Vehicle Summary</title>
+	<title>Tesla Vehicle Summary</title>
 </head>
 
 <body>
@@ -266,7 +266,7 @@ for ($k = 0; $k < $count * 7; $k++) {
 			// Lines of information
 			array_push($html, '    <div class="info">');
 			array_push($html, '      <span class="textInfo large">' . $chargeOmega . '%</span>');
-			array_push($html, '      <span class="textInfo medium">' . date_format($fileDate, 'g:i A') . ' ' . $chargeLo . '</span>');
+			array_push($html, '      <span class="textInfo medium">' . date_format($fileDate, 'g:i A') . '</span>');
 			array_push($html, '      <span class="textInfo medium">' . $activity . ' (' . count($day) . ')</span>');
 			array_push($html, '      <span class="textInfo medium">' . number_format($o0, 1, '.', ',') . ' mi</span>');
 			array_push($html, '    </div>');
