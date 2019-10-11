@@ -2,7 +2,7 @@
 
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-	<link rel="stylesheet" type="text/css" href="common.css?v=13"/>
+	<link rel="stylesheet" type="text/css" href="common.css?v=15"/>
 	<style type="text/css">
 		.hidden {visibility:hidden}
 		.boxContainer {width:898px; height:935px}
@@ -13,8 +13,6 @@
 </head>
 
 <body>
-
-<!-- <div class="boxContainer"> -->
 
 <?php
 date_default_timezone_set('UTC');
@@ -28,10 +26,9 @@ $height = 148;
 $offset = 6;
 $showFadeIcon = True;
 
-$info = array('<div id="debug">');
+// Arrays for HTML and debugging info
 $html = array('<div class="boxContainer">');
-
-// print_r($folders);
+$info = array();
 
 function list_folders($end_date = '20760520', $count = 35) {
 	$folders = scandir($GLOBALS['store'], 0);
@@ -104,8 +101,7 @@ foreach ($folders as $folder) {
 	}
 	array_push($data, $frames);
 }
-array_push($info, implode(' ', $folders));
-// return;
+array_push($info, 'folders = [' . implode(', ', $folders) . ']');
 
 // Common variables
 $i = 0;
@@ -128,14 +124,14 @@ array_push($html, '  <div class="update medium">Last Updated :' . $lastUpdate . 
 // Find the Sunday of the week of interest, then roll back another (count) weeks as the first Sunday of the Calendar
 $oneDay = new DateInterval('P1D');
 for ($k = 0; $k < 7; $k++) {
-	array_push($info, 'Checkpoint 1.' . $k . ' - ' . date_format($fileDate, 'Y-m-d H:i w'));
+	array_push($info, 'Checkpoint 1.' . $k . ' - ' . date_format($fileDate, 'Y-m-d H:i:s D (w)'));
 	if (date_format($fileDate, 'w') == 0) {
 		break;
 	}
 	$fileDate->sub($oneDay);
 }
 $calendarDay = $fileDate->sub(DateInterval::createFromDateString(($count - 1) . 'weeks'));
-array_push($info, 'calendarDay -> ' . date_format($calendarDay, 'Y-m-d H:i D'));
+array_push($info, 'calendarDay -> ' . date_format($calendarDay, 'Y-m-d H:i:s D'));
 
 // Make a top row showing days
 $t0 = clone $calendarDay;
@@ -148,7 +144,6 @@ for ($k = 0; $k < 7; $k++) {
 	array_push($html, '    <div class="titleDayLabel">' . $d . '</div>');
 	array_push($html, '  </div>');
 }
-array_push($info, 'calendarDay -> ' . date_format($calendarDay, 'Y-m-d H:i D'));
 
 // Look for the first data index at the beginning of the calendar
 $i = 0;
@@ -159,15 +154,14 @@ if ($fileDate < $calendarDay) {
 	for ($i = 0; $i < count($data); $i++) {
 		$file = $data[$i][0][0];
 		$date = date_from_filename($file);
-		array_push($info, 'Checkpoint 2.' . $i . ' file = ' . $file . ' -> ' . date_format($date, 'Y-m-d H:i w'));
+		array_push($info, 'Checkpoint 2.' . $i . ' file = ' . $file . ' -> ' . date_format($date, 'Y-m-d H:i:s D (w)'));
 		if (date_format($date, 'w') == 0) {
 			break;
 		}
 	}
 }
-
 $today = DateTime::createFromFormat('YmjHi', date('Ymd') . '0000');
-array_push($info, 'today = ' . date_format($today, 'Ymj-Hi'));
+array_push($info, 'today = ' . date_format($today, 'Ymj H:i:s'));
 array_push($info, 'i = ' . $i);
 
 // Loop through data (i) but up to (count) weeks. The variable j increases on Saturday
@@ -176,7 +170,7 @@ $d = 0;
 $m = 0;
 $o1 = 0;
 $s1 = 0;
-$chargeAlpha = 0;
+$c1 = 0;
 for ($k = 0; $k < $count * 7; $k++) {
 	$x = $d * ($width + $offset);
 	$y = $j * ($height + $offset) + 90;
@@ -212,20 +206,19 @@ for ($k = 0; $k < $count * 7; $k++) {
 			$miles = $o0 - $o1;
 			$carDriven = $miles > 1.0;
 			$activity = $miles >= 0.1 ? '+' . number_format($miles, 1, '.', ',') . ' mi' : 'parked';
-			$o1 = $o0;
 
 			// If there was a charging event
 			$carCharged = False;
-			$chargeLo = 100;
-			$chargeHi = 0;
+			$cMin = 100;
+			$cMax = 0;
 			for ($n = 0; $n < count($day); $n++) {
 				$frame = $day[$n][1];
 				if (!$carCharged and $frame['charge_state']['charging_state'] == 'Charging') {
 					$carCharged = True;
 				}
 				$charge = $frame['charge_state']['battery_level'];
-				$chargeLo = min($chargeLo, $charge);
-				$chargeHi = max($chargeHi, $charge);
+				$cMin = min($cMin, $charge);
+				$cMax = max($cMax, $charge);
 			}
 
 			// Software version
@@ -235,26 +228,28 @@ for ($k = 0; $k < $count * 7; $k++) {
 			}
 			$s0 = $frameOmega['vehicle_state']['car_version'];
 			$carUpdated = $s0 != $s1;
-			$s1 = $s0;
 
 			// Battery level
-			if ($chargeAlpha == 0) {
-				$chargeAlpha = $frameAlpha['charge_state']['battery_level'];
+			if ($c1 == 0) {
+				$c1 = $frameAlpha['charge_state']['battery_level'];
 			}
-			$chargeOmega = $frameOmega['charge_state']['battery_level'];
+			$c0 = $frameOmega['charge_state']['battery_level'];
 			$elemClass = '';
-			$r = floor($chargeOmega * 0.1);
+			$r = floor($c0 * 0.1);
 			if ($r <= 5) {
 				$elemClass .= ' charge' . $r;
 			}
-			array_push($html, '    <div class="charge endOfDay' . $elemClass . '" style="height:' . $chargeOmega . '%"></div>');
+			array_push($html, '    <div class="charge endOfDay' . $elemClass . '" style="height:' . $c0 . '%"></div>');
 			if ($carCharged) {
-				array_push($html, '    <div class="charge added" style="bottom:' . $chargeOmega . '%; height:' . ($chargeHi - $chargeOmega) . '%"></div>');
-				array_push($html, '    <div class="charge addedUsed" style="bottom:' .  $chargeLo . '%; height:' . ($chargeOmega - $chargeLo) . '%"></div>');
+				array_push($html, '    <div class="charge added" style="bottom:' . $c0 . '%; height:' . ($cMax - $c0) . '%"></div>');
+				if ($c0 - $cMin) {
+					array_push($html, '    <div class="charge addedUsed" style="bottom:' .  $cMin . '%; height:' . ($c0 - $cMin) . '%"></div>');
+				} elseif ($c1 - $cMin) {
+					array_push($html, '    <div class="charge usedAdded" style="bottom:' .  $cMin . '%; height:' . ($c1 - $cMin) . '%"></div>');
+				}
 			} else {
-				array_push($html, '    <div class="charge used" style="bottom:' . $chargeOmega . '%; height:' . ($chargeAlpha - $chargeOmega) . '%"></div>');
+				array_push($html, '    <div class="charge used" style="bottom:' . $c0 . '%; height:' . ($c1 - $c0) . '%"></div>');
 			}
-			$chargeAlpha = $chargeOmega;
 
 			// Icon bar using the information derived earlier
 			array_push($html, '    <div class="iconBar">');
@@ -265,13 +260,33 @@ for ($k = 0; $k < $count * 7; $k++) {
 
 			// Lines of information
 			array_push($html, '    <div class="info">');
-			array_push($html, '      <span class="textInfo large">' . $chargeOmega . '%</span>');
+			array_push($html, '      <span class="textInfo large">' . $c0 . '%</span>');
 			array_push($html, '      <span class="textInfo medium">' . date_format($fileDate, 'g:i A') . '</span>');
 			array_push($html, '      <span class="textInfo medium">' . $activity . ' (' . count($day) . ')</span>');
 			array_push($html, '      <span class="textInfo medium">' . number_format($o0, 1, '.', ',') . ' mi</span>');
 			array_push($html, '    </div>');
 
+			$c1 = $c0;
+			$o1 = $o0;
+			$s1 = $s0;
 			$i++;
+		} else {
+			array_push($html, '    <div class="charge endOfDay predict' . $elemClass . '" style="height:' . $c0 . '%"></div>');
+
+			// Icon bar using the information derived earlier
+			array_push($html, '    <div class="iconBar">');
+			array_push($html, '      ' . insert_or_fade_icon(False, 'blob/wheel.png'));
+			array_push($html, '      ' . insert_or_fade_icon(False, 'blob/charge.png'));
+			array_push($html, '      ' . insert_or_fade_icon(False, 'blob/up.png'));
+			array_push($html, '    </div>');
+
+			// Lines of information
+			array_push($html, '    <div class="info">');
+			array_push($html, '      <span class="textInfo large predict">' . $c0 . '%</span>');
+			array_push($html, '      <span class="textInfo medium">No data</span>');
+			array_push($html, '      <span class="textInfo medium">Likely parked</span>');
+			array_push($html, '      <span class="textInfo medium">' . number_format($o0, 1, '.', ',') . ' mi</span>');
+			array_push($html, '    </div>');
 		}
 	}
 	array_push($html, '  </div>');
@@ -284,12 +299,13 @@ for ($k = 0; $k < $count * 7; $k++) {
 }
 
 array_push($html, '</div>');
-array_push($info, '</div>');
 
-echo join("\n", $html);
+echo implode("\n", $html);
 
 if ($debug) {
-	echo join("<br/>\n", $info);
+	echo '<div id="debug">' . "\n";
+	echo implode("\n", $info);
+	echo '</div>' . "\n";
 }
 
 ?>
