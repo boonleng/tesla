@@ -2,7 +2,7 @@
 
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-	<link rel="stylesheet" type="text/css" href="common.css?v=15"/>
+	<link rel="stylesheet" type="text/css" href="common.css?v=16"/>
 	<style type="text/css">
 		.hidden {visibility:hidden}
 		.boxContainer {width:898px; height:935px}
