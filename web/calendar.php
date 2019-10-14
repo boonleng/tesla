@@ -151,14 +151,15 @@ $file = $data[$i][0][0];
 $fileDate = date_from_filename($file);
 if ($fileDate < $calendarDay) {
 	$t0 = clone $calendarDay;
-	for ($i = 0; $i < count($data); $i++) {
+	array_push($info, 'Checkpoint 2.0 - ' . date_format($fileDate, 'Y-m-d H:i:s D') . ' / ' 
+		                                  . date_format($calendarDay, 'Y-m-d H:i:s D') . ' -> '
+		                                  . ($fileDate < $calendarDay ? 'Y' : 'N'));
+	do {
+		$i++;
 		$file = $data[$i][0][0];
-		$date = date_from_filename($file);
-		array_push($info, 'Checkpoint 2.' . $i . ' file = ' . $file . ' -> ' . date_format($date, 'Y-m-d H:i:s D (w)'));
-		if (date_format($date, 'w') == 0) {
-			break;
-		}
-	}
+		$fileDate = date_from_filename($file);
+		array_push($info, 'Checkpoint 2.' . $i . ' file = ' . $file . ' -> ' . date_format($fileDate, 'Y-m-d H:i:s D (w)'));
+	} while (($fileDate < $calendarDay) && ($i < count($data)));
 }
 $today = DateTime::createFromFormat('YmjHi', date('Ymd') . '0000');
 array_push($info, 'today = ' . date_format($today, 'Ymj H:i:s'));
