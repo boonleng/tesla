@@ -15,7 +15,8 @@
 <body>
 
 <?php
-date_default_timezone_set('UTC');
+date_default_timezone_set('America/Chicago');
+#date_default_timezone_set('UTC');
 
 // Global variables
 $store = '/home/boonleng/Documents/Tesla';
