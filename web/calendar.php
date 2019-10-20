@@ -34,7 +34,6 @@ $info = array();
 function list_folders($end_date = '20760520', $count = 35) {
 	$folders = scandir($GLOBALS['store'], 0);
 	$index = array_search($end_date, $folders);
-	// echo "$end_date = $end_date   index = $index\n";
 	array_push($GLOBALS['info'], "index = $index");
 	// print_r($folders);
 	if ($index) {
@@ -113,6 +112,9 @@ $fileDate = date_from_filename($file);
 $targetMonth = date_format($fileDate, 'm');
 $vin = $frame['vin'] . ' - ' . $frame['vehicle_state']['car_version'];
 $lastUpdate = date_format(datetime_from_filename($file), 'Y-m-d g:i A');
+$today = DateTime::createFromFormat('YmjHi', date('Ymd') . '0000');
+$oneDay = new DateInterval('P1D');
+array_push($info, 'today = ' . date_format($today, 'Ymj H:i:s'));
 
 // Calendar HTML
 array_push($html, '  <div class="title">');
@@ -123,15 +125,14 @@ array_push($html, '  <div class="vin medium"><b>' . $frame['vehicle_state']['veh
 array_push($html, '  <div class="update medium">Last Updated :' . $lastUpdate . '</div>');
 
 // Find the Sunday of the week of interest, then roll back another (count) weeks as the first Sunday of the Calendar
-$oneDay = new DateInterval('P1D');
+$t0 = clone $today;
 for ($k = 0; $k < 7; $k++) {
-	array_push($info, 'Checkpoint 1.' . $k . ' - ' . date_format($fileDate, 'Y-m-d H:i:s D (w)'));
-	if (date_format($fileDate, 'w') == 0) {
+	if (date_format($t0, 'w') == 0) {
 		break;
 	}
-	$fileDate->sub($oneDay);
+	$t0->sub($oneDay);
 }
-$calendarDay = $fileDate->sub(DateInterval::createFromDateString(($count - 1) . 'weeks'));
+$calendarDay = $t0->sub(DateInterval::createFromDateString(($count - 1) . 'weeks'));
 array_push($info, 'calendarDay -> ' . date_format($calendarDay, 'Y-m-d H:i:s D'));
 
 // Make a top row showing days
@@ -152,8 +153,8 @@ $file = $data[$i][0][0];
 $fileDate = date_from_filename($file);
 if ($fileDate < $calendarDay) {
 	$t0 = clone $calendarDay;
-	array_push($info, 'Checkpoint 2.0 - ' . date_format($fileDate, 'Y-m-d H:i:s D') . ' / ' 
-		                                  . date_format($calendarDay, 'Y-m-d H:i:s D') . ' -> '
+	array_push($info, 'Checkpoint 2.0 - ' . 'fileDate = ' . date_format($fileDate, 'Y-m-d H:i:s D') . ' < ' 
+		                                  . 'calendarDate = ' . date_format($calendarDay, 'Y-m-d H:i:s D') . ' -> '
 		                                  . ($fileDate < $calendarDay ? 'Y' : 'N'));
 	do {
 		$i++;
@@ -162,8 +163,6 @@ if ($fileDate < $calendarDay) {
 		array_push($info, 'Checkpoint 2.' . $i . ' file = ' . $file . ' -> ' . date_format($fileDate, 'Y-m-d H:i:s D (w)'));
 	} while (($fileDate < $calendarDay) && ($i < count($data)));
 }
-$today = DateTime::createFromFormat('YmjHi', date('Ymd') . '0000');
-array_push($info, 'today = ' . date_format($today, 'Ymj H:i:s'));
 array_push($info, 'i = ' . $i);
 
 // Loop through data (i) but up to (count) weeks. The variable j increases on Saturday
