@@ -1,10 +1,10 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
+<html>
 
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 	<link rel="stylesheet" type="text/css" href="common.css?v=16"/>
 	<style type="text/css">
-		.hidden {visibility:hidden}
 		.boxContainer {width:898px; height:935px}
 		.dayOfWeek {width:123px; height:50px}
 		.box {width:123px; height:148px}

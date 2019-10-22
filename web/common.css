@@ -1,6 +1,8 @@
 @font-face {font-family: 'Helvetica Neue'; src: url(fonts/HelveticaNeueLight.ttf)}
 html {font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 10pt}
 
+.hidden {visibility:hidden}
+
 .boxContainer {display:block; position:relative; top:10px; margin:0 auto; background-color:white}
 
 .title {display:block; position:absolute; top:0}
