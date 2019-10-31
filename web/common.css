@@ -24,7 +24,7 @@ html {font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 10pt}
 .charge .tooltip .label, .charge .tooltip .backdrop {opacity:0; position:absolute; display:block; left:50%; bottom:100%; width:40px; height:20px; margin-left:-20px; margin-bottom:5px; box-sizing:border-box}
 .charge .tooltip .label {color:white; line-height:20px; font-weight:500; text-align:center; text-align:center; border-radius:5px; z-index:110}
 .charge .tooltip .backdrop {background-color:var(--bg-color); border-radius:5px}
-.charge .tooltip .backdrop:after {content:''; position:absolute; left:50%; top:95%; margin-left:-6px; box-sizing:border-box; border:6px solid; border-color:var(--border-color)}
+.charge .tooltip .backdrop:before {content:''; position:absolute; left:50%; top:95%; margin-left:-6px; box-sizing:border-box; border:6px solid; border-color:var(--border-color)}
 .charge:hover .tooltip .label {opacity:1.0; transition: all 0.18s linear}
 .charge:hover .tooltip .backdrop {opacity:0.75; transition: all 0.18s linear}
 .used {background-color:#ddd}
