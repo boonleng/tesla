@@ -1,10 +1,13 @@
 @font-face {font-family: 'Helvetica Neue'; src: url(fonts/HelveticaNeueLight.ttf)}
 html {font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 10pt}
 
+:root {--bg-color:rgba(0, 0, 50, 0.75)};
+.hidden {visibility:hidden}
+
 .boxContainer {display:block; position:relative; top:10px; margin:0 auto; background-color:white}
 
 .title {display:block; position:absolute; top:0}
-.titleMonth, .titleYear {display:inline-block; font-size:2.4em;}
+.titleMonth, .titleYear {display:inline-block; font-size:2.4em}
 .titleMonth {font-weight:500}
 .titleYear {margin-left:0.25em}
 .vin {display:block; position:absolute; right:0}
@@ -13,16 +16,19 @@ html {font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 10pt}
 
 .box {display:inline-block; position:absolute; width:123.00px; height:164.00px; border:solid 1px #aaa}
 
-.dayLabel, .titleDayLabel {display:block; position:absolute; top:5px; right:5px; font-size:1.1em; z-index:100}
+.dayLabel, .titleDayLabel {display:block; position:absolute; top:5px; right:5px; font-size:1.1em; z-index:100; pointer-events:none}
 .today {color:#39f; font-weight:500}
 .titleDayLabel {font-size:1.2em}
 .otherMonth {color:#aaa}
 .charge {display:block; position:absolute; width:100%}
-.used {background-color:#ddd; z-index:1}
-.added {background-color:#7ff; z-index:3}
-.addedUsed {background-color:#4f2; z-index:3}
-.usedAdded {background-color:#5ef; z-index:3}
-.endOfDay {bottom:0; background-color:#8f0; z-index:2}
+.charge .tooltip {opacity:0; position:absolute; display:block; left:50%; bottom:100%; width:40px; height:20px; line-height:20px; margin-left:-20px; margin-bottom:5px; background-color:var(--bg-color); color:white; font-weight:500; text-align:center; border-radius:5px; z-index:110}
+.charge .tooltip:after {content:''; position:absolute; left:50%; top:100%; margin-left:-5px; box-sizing:border-box; border:5px solid; border-color:var(--bg-color) transparent transparent transparent}
+.charge:hover .tooltip {opacity:1.0; transition: all 0.18s linear}
+.used {background-color:#ddd}
+.added {background-color:#7ff}
+.addedUsed {background-color:#4f2}
+.usedAdded {background-color:#5ef}
+.endOfDay {background-color:#8f0; bottom:0}
 .charge5 {background-color:#88ff00}
 .charge4 {background-color:#c3ee00}
 .charge3 {background-color:#ffdd00}
@@ -31,15 +37,15 @@ html {font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 10pt}
 .charge0 {background-color:#ff4499}
 .predict {opacity:0.3}
 
-.info {display:block; position:absolute; bottom:8%; width:95.0%; margin:0 2.5%; padding:0; text-align:center; z-index:100}
+.info {display:block; position:absolute; bottom:8%; width:95.0%; margin:0 2.5%; padding:0; text-align:center; z-index:100; pointer-events:none}
 .textInfo {display:block; width:100%; margin-bottom:0.3em; line-height:1.0em}
 .large {font-size:1.8em; font-weight:500; font-stretch:extra-expanded}
 .medium {font-size:1.0em}
 .small {font-size:0.9em}
 .tiny {font-size:0.8em}
 
-.iconBar {display:block; position:absolute; top:5px; left:8px; width:100%; z-index:100}
+.iconBar {display:block; position:absolute; top:5px; left:8px; width:100%; z-index:100; pointer-events:none}
 img.icon, img.blankIcon {display:block; float:left; margin:0; width:16px; height:16px; padding:2px 3px}
-.fade {opacity:0.15;}
+.fade {opacity:0.15}
 
-#debug {display:block; position:relative; background-color: #fcc; bottom:0; font-size:1.2em; font-family:monospace; white-space:pre; word-wrap:break-word;}
+#debug {display:block; position:relative; background-color: #fcc; bottom:0; font-size:1.2em; font-family:monospace; white-space:pre; word-wrap:break-word}

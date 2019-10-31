@@ -1,10 +1,15 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 	<link rel="stylesheet" type="text/css" href="common.css?v=16"/>
+	<link rel="apple-touch-icon" sizes="57x57" href="blob/tesla-57.png"/>
+	<link rel="apple-touch-icon" sizes="60x60" href="blob/tesla-160.png"/>
+	<link rel="apple-touch-icon" sizes="114x114" href="blob/tesla-114.png"/>
+	<link rel="apple-touch-icon" sizes="120x120" href="blob/tesla-120.png"/>
+	<link rel="apple-touch-icon" sizes="144x144" href="blob/tesla-144.png"/>
+	<link rel="apple-touch-icon" sizes="152x152" href="blob/tesla-152.png"/>
 	<style type="text/css">
-		.hidden {visibility:hidden}
 		.boxContainer {width:898px; height:935px}
 		.dayOfWeek {width:123px; height:50px}
 		.box {width:123px; height:148px}
@@ -230,6 +235,13 @@ for ($k = 0; $k < $count * 7; $k++) {
 			$s0 = $frameOmega['vehicle_state']['car_version'];
 			$carUpdated = $s0 != $s1;
 
+			// Icon bar using the information derived earlier
+			array_push($html, '    <div class="iconBar">');
+			array_push($html, '      ' . insert_or_fade_icon($carDriven, 'blob/wheel.png'));
+			array_push($html, '      ' . insert_or_fade_icon($carCharged, 'blob/charge.png'));
+			array_push($html, '      ' . insert_or_fade_icon($carUpdated, 'blob/up.png'));
+			array_push($html, '    </div>');
+
 			// Battery level
 			if ($c1 == 0) {
 				$c1 = $frameAlpha['charge_state']['battery_level'];
@@ -242,22 +254,19 @@ for ($k = 0; $k < $count * 7; $k++) {
 			}
 			array_push($html, '    <div class="charge endOfDay' . $elemClass . '" style="height:' . $c0 . '%"></div>');
 			if ($carCharged) {
-				array_push($html, '    <div class="charge added" style="bottom:' . $c0 . '%; height:' . ($cMax - $c0) . '%"></div>');
+				array_push($html, '    <div class="charge added" style="bottom:' . $c0 . '%; height:' . ($cMax - $c0) . '%">');
+				array_push($html, '      <div class="tooltip">' . $cMax . '%</div>');
+				array_push($html, '    </div>');
 				if ($c0 - $cMin) {
 					array_push($html, '    <div class="charge addedUsed" style="bottom:' .  $cMin . '%; height:' . ($c0 - $cMin) . '%"></div>');
 				} elseif ($c1 - $cMin) {
 					array_push($html, '    <div class="charge usedAdded" style="bottom:' .  $cMin . '%; height:' . ($c1 - $cMin) . '%"></div>');
 				}
 			} else {
-				array_push($html, '    <div class="charge used" style="bottom:' . $c0 . '%; height:' . ($c1 - $c0) . '%"></div>');
+				array_push($html, '    <div class="charge used" style="bottom:' . $c0 . '%; height:' . ($c1 - $c0) . '%">');
+				array_push($html, '      <div class="tooltip">' . $c1 . '%</div>');
+				array_push($html, '    </div>');
 			}
-
-			// Icon bar using the information derived earlier
-			array_push($html, '    <div class="iconBar">');
-			array_push($html, '      ' . insert_or_fade_icon($carDriven, 'blob/wheel.png'));
-			array_push($html, '      ' . insert_or_fade_icon($carCharged, 'blob/charge.png'));
-			array_push($html, '      ' . insert_or_fade_icon($carUpdated, 'blob/up.png'));
-			array_push($html, '    </div>');
 
 			// Lines of information
 			array_push($html, '    <div class="info">');
