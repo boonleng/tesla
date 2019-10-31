@@ -255,7 +255,7 @@ for ($k = 0; $k < $count * 7; $k++) {
 			array_push($html, '    <div class="charge endOfDay' . $elemClass . '" style="height:' . $c0 . '%"></div>');
 			if ($carCharged) {
 				array_push($html, '    <div class="charge added" style="bottom:' . $c0 . '%; height:' . ($cMax - $c0) . '%">');
-				array_push($html, '      <div class="tooltip">' . $cMax . '%</div>');
+				array_push($html, '      <div class="tooltip"><div class="backdrop"></div><div class="label">' . $cMax . '%</div></div>');
 				array_push($html, '    </div>');
 				if ($c0 - $cMin) {
 					array_push($html, '    <div class="charge addedUsed" style="bottom:' .  $cMin . '%; height:' . ($c0 - $cMin) . '%"></div>');
@@ -264,7 +264,7 @@ for ($k = 0; $k < $count * 7; $k++) {
 				}
 			} else {
 				array_push($html, '    <div class="charge used" style="bottom:' . $c0 . '%; height:' . ($c1 - $c0) . '%">');
-				array_push($html, '      <div class="tooltip">' . $c1 . '%</div>');
+				array_push($html, '      <div class="tooltip"><div class="backdrop"></div><div class="label">' . $cMax . '%</div></div>');
 				array_push($html, '    </div>');
 			}
 
