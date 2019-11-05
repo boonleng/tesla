@@ -16,8 +16,8 @@ def configParserToConfig(config):
     return {'username':config['user']['username'], 'timezone':config['user']['timezone'], 'token':dict(config['token']), 'cars':cars}
 
 
-def getConfig(force=False):
-    if not os.path.exists(base.rcFile) or force:
+def getConfig(forceCreate=False, forceRefresh=False):
+    if not os.path.exists(base.rcFile) or forceCreate:
         base.logger.info('No configuration file. Setting up ...')
         try:
             username = input('Enter username: ')
@@ -61,7 +61,7 @@ def getConfig(force=False):
         token = r.json()
 
         # Retrieve a list of vehicles
-        url = 'https://owner-api.teslamotors.com/api/1/vehicles'
+        url = 'https://{}/api/1/vehicles'.format(base.site)
         headers = {
             'Authorization': 'Bearer {}'.format(token['access_token'])
         }
@@ -109,9 +109,44 @@ def getConfig(force=False):
     # Check for the expiration time
     now = time.mktime(time.localtime())
     days = (float(config['token']['created_at']) + float(config['token']['expires_in']) - now) / 86400
-    if days <= 7:
+    if days <= 7 or forceRefresh:
         base.logger.info('Token expiring in {:.1f} days. Refreshing ...'.format(days))
-        refreshToken(config)
+        #refreshToken(config)
+        url = 'https://{}/oauth/token'.format(base.site)
+        payload = {
+            'grant_type': 'refresh_token',
+            'client_id': '81527cff06843c8634fdc09e8ac0abefb46ac849f38fe1e431c2ef2106796384',
+            'client_secret': 'c7257eb71a564034f9419ee651c7d0e5f7aa6bfbd18bafb5c5c033b093bb2fa3',
+            'refresh_token': config['token']['refresh_token']
+        }
+        headers = {
+            'Host': base.site,
+            'User-Agent': 'Learning',
+            'Content-Type': 'application/json'
+        }
+        r = requests.post(url, data=json.dumps(payload), headers=headers)
+        if r.status_code != 200:
+            base.logger.exception('Unable to retrieve token. r = {}'.format(r.status_code))
+            return None
+        token = r.json()
+
+        # Copy over the old config but update the token
+        newConfig = configparser.ConfigParser()
+        newConfig.add_section('user')
+        newConfig.add_section('token')
+        newConfig['user'] = config['user']
+        newConfig['token'] = token
+        # Gather the cars
+        for sec in config.sections():
+            if sec not in ['user', 'token']:
+                newConfig.add_section(sec)
+                newConfig[sec] = config[sec]
+        with open(base.rcFile, 'w') as fid:
+            newConfig.write(fid)
+        now = time.mktime(time.localtime())
+        days = (float(config['token']['created_at']) + float(config['token']['expires_in']) - now) / 86400
+        base.logger.info('Token refreshed. New token will last another {:.1f} days.'.format(days))
+        config = newConfig
 
     return configParserToConfig(config)
 
@@ -128,42 +163,42 @@ def tokenDaysLeft():
     return (float(config['token']['created_at']) + float(config['token']['expires_in']) - now) / 86400
 
 
-def refreshToken(config):
-    url = 'https://{}/oauth/token'.format(base.site)
-    payload = {
-        'grant_type': 'refresh_token',
-        'client_id': '81527cff06843c8634fdc09e8ac0abefb46ac849f38fe1e431c2ef2106796384',
-        'client_secret': 'c7257eb71a564034f9419ee651c7d0e5f7aa6bfbd18bafb5c5c033b093bb2fa3',
-        'refresh_token': config['token']['refresh_token']
-    }
-    headers = {
-        'Host': base.site,
-        'User-Agent': 'Learning',
-        'Content-Type': 'application/json'
-    }
-    r = requests.post(url, data=json.dumps(payload), headers=headers)
-    if r.status_code != 200:
-        base.logger.exception('Unable to retrieve token. r = {}'.format(r.status_code))
-        return None
-    token = r.json()
+# def refreshToken(config):
+#     url = 'https://{}/oauth/token'.format(base.site)
+#     payload = {
+#         'grant_type': 'refresh_token',
+#         'client_id': '81527cff06843c8634fdc09e8ac0abefb46ac849f38fe1e431c2ef2106796384',
+#         'client_secret': 'c7257eb71a564034f9419ee651c7d0e5f7aa6bfbd18bafb5c5c033b093bb2fa3',
+#         'refresh_token': config['token']['refresh_token']
+#     }
+#     headers = {
+#         'Host': base.site,
+#         'User-Agent': 'Learning',
+#         'Content-Type': 'application/json'
+#     }
+#     r = requests.post(url, data=json.dumps(payload), headers=headers)
+#     if r.status_code != 200:
+#         base.logger.exception('Unable to retrieve token. r = {}'.format(r.status_code))
+#         return None
+#     token = r.json()
 
-    # Copy over the old config but update the token
-    newConfig = configparser.ConfigParser()
-    newConfig.add_section('user')
-    newConfig.add_section('token')
-    newConfig['user'] = config['user']
-    newConfig['token'] = token
-    # Gather the cars
-    for sec in config.sections():
-        if sec not in ['user', 'token']:
-            newConfig.add_section(sec)
-            newConfig[sec] = config[sec]
-    with open(base.rcFile, 'w') as fid:
-        newConfig.write(fid)
-    now = time.mktime(time.localtime())
-    days = (float(config['token']['created_at']) + float(config['token']['expires_in']) - now) / 86400
-    base.logger.info('Token refreshed. New token will last another {:.1f} days.'.format(days))
-    return config
+#     # Copy over the old config but update the token
+#     newConfig = configparser.ConfigParser()
+#     newConfig.add_section('user')
+#     newConfig.add_section('token')
+#     newConfig['user'] = config['user']
+#     newConfig['token'] = token
+#     # Gather the cars
+#     for sec in config.sections():
+#         if sec not in ['user', 'token']:
+#             newConfig.add_section(sec)
+#             newConfig[sec] = config[sec]
+#     with open(base.rcFile, 'w') as fid:
+#         newConfig.write(fid)
+#     now = time.mktime(time.localtime())
+#     days = (float(config['token']['created_at']) + float(config['token']['expires_in']) - now) / 86400
+#     base.logger.info('Token refreshed. New token will last another {:.1f} days.'.format(days))
+#     return config
 
 def refreshCars():
     config = getConfig()
@@ -192,5 +227,5 @@ def refreshCars():
             newConfig.write(fid)
         return configParserToConfig(newConfig)
     else:
-        base.logger.exception('Unable to retrieve list of vehicles.')
+        base.logger.exception('Unable to retrieve the list of vehicles.')
     return config
