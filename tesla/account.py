@@ -110,8 +110,8 @@ def getConfig(force=False):
     now = time.mktime(time.localtime())
     days = (float(config['token']['created_at']) + float(config['token']['expires_in']) - now) / 86400
     if days <= 7:
-        logger.info('Token expiring in {:.1f} days. Refreshing ...'.format(days))
-        refreshToken()
+        base.logger.info('Token expiring in {:.1f} days. Refreshing ...'.format(days))
+        refreshToken(config)
 
     return configParserToConfig(config)
 
@@ -128,8 +128,7 @@ def tokenDaysLeft():
     return (float(config['token']['created_at']) + float(config['token']['expires_in']) - now) / 86400
 
 
-def refreshToken():
-    config = getConfig()
+def refreshToken(config):
     url = 'https://{}/oauth/token'.format(base.site)
     payload = {
         'grant_type': 'refresh_token',
@@ -163,7 +162,7 @@ def refreshToken():
         newConfig.write(fid)
     now = time.mktime(time.localtime())
     days = (float(config['token']['created_at']) + float(config['token']['expires_in']) - now) / 86400
-    logger.info('Token refreshed. New token will last another {:.1f} days.'.format(days))
+    base.logger.info('Token refreshed. New token will last another {:.1f} days.'.format(days))
     return config
 
 def refreshCars():
