@@ -163,42 +163,8 @@ def tokenDaysLeft():
     return (float(config['token']['created_at']) + float(config['token']['expires_in']) - now) / 86400
 
 
-# def refreshToken(config):
-#     url = 'https://{}/oauth/token'.format(base.site)
-#     payload = {
-#         'grant_type': 'refresh_token',
-#         'client_id': '81527cff06843c8634fdc09e8ac0abefb46ac849f38fe1e431c2ef2106796384',
-#         'client_secret': 'c7257eb71a564034f9419ee651c7d0e5f7aa6bfbd18bafb5c5c033b093bb2fa3',
-#         'refresh_token': config['token']['refresh_token']
-#     }
-#     headers = {
-#         'Host': base.site,
-#         'User-Agent': 'Learning',
-#         'Content-Type': 'application/json'
-#     }
-#     r = requests.post(url, data=json.dumps(payload), headers=headers)
-#     if r.status_code != 200:
-#         base.logger.exception('Unable to retrieve token. r = {}'.format(r.status_code))
-#         return None
-#     token = r.json()
-
-#     # Copy over the old config but update the token
-#     newConfig = configparser.ConfigParser()
-#     newConfig.add_section('user')
-#     newConfig.add_section('token')
-#     newConfig['user'] = config['user']
-#     newConfig['token'] = token
-#     # Gather the cars
-#     for sec in config.sections():
-#         if sec not in ['user', 'token']:
-#             newConfig.add_section(sec)
-#             newConfig[sec] = config[sec]
-#     with open(base.rcFile, 'w') as fid:
-#         newConfig.write(fid)
-#     now = time.mktime(time.localtime())
-#     days = (float(config['token']['created_at']) + float(config['token']['expires_in']) - now) / 86400
-#     base.logger.info('Token refreshed. New token will last another {:.1f} days.'.format(days))
-#     return config
+def refreshToken():
+    return getConfig(forceRefresh=True)
 
 def refreshCars():
     config = getConfig()
