@@ -32,13 +32,14 @@ import time
 import requests
 
 from .base import *
+# from . import base
 from . import account
 
 config = account.getConfig()
 
 def requestData(index=0, retry=True):
     vehicleId = config['cars'][index]['id']
-    url = 'https://owner-api.teslamotors.com/api/1/vehicles/{}/vehicle_data'.format(vehicleId)
+    url = 'https://{}/api/1/vehicles/{}/vehicle_data'.format(site, vehicleId)
     headers = {
         'Authorization': 'Bearer {}'.format(config['token']['access_token'])
     }
@@ -47,16 +48,16 @@ def requestData(index=0, retry=True):
         return res.json()['response']
     elif res.status_code == 404 and retry:
         # Not found
-        base.logger.info('Vechicle not found. Try refreshing cars... r = {}'.format(res.status_code))
+        logger.info('Vechicle not found. Try refreshing cars... r = {}'.format(res.status_code))
         account.refreshCars()
         return requestData(index=index, retry=False)
     if res.status_code == 504:
         # Gateway timeout
-        base.logger.info('Gateway timeout. Retry in 10 seconds ...')
+        logger.info('Gateway timeout. Retry in 10 seconds ...')
         time.sleep(10)
         return requestData(index=index, retry=True)
     if res.status_code not in [408]:
-        base.logger.warning('Vechicle connection error. r = {}'.format(res.status_code))
+        logger.warning('Vechicle connection error. r = {}'.format(res.status_code))
     return None
 
 def objFromFile(filename):
@@ -66,7 +67,7 @@ def objFromFile(filename):
     return json.loads(json_str)
 
 def getLatestDays(count=28, readAll=False):
-    folders = glob.glob('{}/2*'.format(base.dataLogHome))
+    folders = glob.glob('{}/2*'.format(dataLogHome))
     folders.sort()
 
     t = []
@@ -79,7 +80,7 @@ def getLatestDays(count=28, readAll=False):
             data = objFromFile(file)
             dd.append(data)
         d.append(dd)
-        o = objFromFile(files[-1])
+        # o = objFromFile(files[-1])
         f = os.path.basename(files[-1])
         s = time.mktime(time.strptime(f, '%Y%m%d-%H%M.json'))
         #s = d[-1][-1]['charge_state']['timestamp'] / 1000
@@ -87,7 +88,7 @@ def getLatestDays(count=28, readAll=False):
         t.append(s)
         # s2 = d[-1][-1]['charge_state']['timestamp'] / 1000
         # t2 = time.localtime(s2)
-        # print('{} -> {} / {} {}'.format(f, 
+        # print('{} -> {} / {} {}'.format(f,
         #     time.strftime('%Y-%m-%d %H:%M', time.localtime(s)),
         #     time.strftime('%Y-%m-%d %H:%M', t2), t2.tm_zone))
     return t, d
@@ -154,7 +155,7 @@ def getDataInHTML(count=4, padding=0.05, showFadeIcon=True):
         found = importlib.util.find_spec('matplotlib') is not None
     if found:
         import tesla.font
-        prop = tesla.font.Properties()
+        _ = tesla.font.Properties()
 
     # Initial figsize to get things started
     figsize = (900, 135 * len(tt) + 90)
