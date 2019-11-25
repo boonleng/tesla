@@ -37,7 +37,7 @@ from . import account
 
 config = account.getConfig()
 
-def requestData(index=0, retry=True):
+def requestData(index=0, retry=3):
     vehicleId = config['cars'][index]['id']
     url = 'https://{}/api/1/vehicles/{}/vehicle_data'.format(site, vehicleId)
     headers = {
@@ -46,18 +46,19 @@ def requestData(index=0, retry=True):
     res = requests.get(url, headers=headers)
     if res.status_code == 200:
         return res.json()['response']
-    elif res.status_code == 404 and retry:
+    if res.status_code == 404:
         # Not found
         logger.info('Vechicle not found. Try refreshing cars... r = {}'.format(res.status_code))
         account.refreshCars()
-        return requestData(index=index, retry=False)
-    if res.status_code == 504:
-        # Gateway timeout
-        logger.info('Gateway timeout. Retry in 10 seconds ...')
+        return requestData(index=index, retry=retry-1)
+    logger.warning('Vechicle connection error... r = {}   retry = {}'.format(res.status_code, retry))
+    if retry > 0 and res.status_code in [408, 502, 504]:
+        # 408 Request Timeout
+        # 502 Bad Gateway
+        # 504 Gateway Timeout
+        logger.warning('Retry in 10 seconds ...')
         time.sleep(10)
-        return requestData(index=index, retry=True)
-    if res.status_code not in [408]:
-        logger.warning('Vechicle connection error. r = {}'.format(res.status_code))
+        return requestData(index=index, retry=retry-1)
     return None
 
 def objFromFile(filename):
