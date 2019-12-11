@@ -38,6 +38,7 @@ from . import account
 config = account.getConfig()
 
 def requestData(index=0, retry=3):
+    global config
     vehicleId = config['cars'][index]['id']
     url = 'https://{}/api/1/vehicles/{}/vehicle_data'.format(site, vehicleId)
     headers = {
@@ -52,6 +53,13 @@ def requestData(index=0, retry=3):
         account.refreshCars()
         return requestData(index=index, retry=retry-1)
     logger.warning('Vechicle connection error... r = {}   retry = {}'.format(res.status_code, retry))
+    if res.status_code == 401:
+        # 401 Unauthorized
+        logger.warning('Unauthorized, perhaps the Tesla account password has changed.')
+        config  = account.getConfig(forceCreate=True, forceGetPassword=True)
+        if config is None:
+            return None
+        return requestData(index=index, retry=retry)
     if retry > 0 and res.status_code in [408, 502, 504]:
         # 408 Request Timeout
         # 502 Bad Gateway

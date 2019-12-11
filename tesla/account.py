@@ -16,9 +16,13 @@ def configParserToConfig(config):
     return {'username':config['user']['username'], 'timezone':config['user']['timezone'], 'token':dict(config['token']), 'cars':cars}
 
 
-def getConfig(forceCreate=False, forceRefresh=False):
+def getConfig(forceCreate=False, forceRefresh=False, forceGetPassword=False):
     if not os.path.exists(base.rcFile) or forceCreate:
         base.logger.info('No configuration file. Setting up ...')
+        import __main__ as main
+        if not hasattr(main, '__file__'):
+            base.logger.exception('Not in interactive mode. Unable to continue.')
+            return None
         try:
             username = input('Enter username: ')
             if len(username) == 0:
@@ -32,7 +36,7 @@ def getConfig(forceCreate=False, forceRefresh=False):
         import keyring
 
         password = keyring.get_password(base.site, username)
-        if not password:
+        if not password or forceGetPassword:
             password = getpass.getpass('Enter password: ')
             if not password:
                 base.logger.info('Setup aborted. No password provided.')
@@ -165,6 +169,7 @@ def tokenDaysLeft():
 
 def refreshToken():
     return getConfig(forceRefresh=True)
+
 
 def refreshCars():
     config = getConfig()
